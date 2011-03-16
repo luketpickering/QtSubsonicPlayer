@@ -3,7 +3,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtXml>
 #include <QUrl>
-#include "subrequestxml.h"
+#include "xmlrequests/subrequestxml.h"
 
 // SubRequest Methods *********************************************************
 
@@ -73,8 +73,7 @@ void SubRequestXML::recievedData()
         }
     }
     else {
-        printf("Http error code:%i -"
-               + netReply->errorString().toLocal8Bit(), netReply->error());
+        //add some logging here
     }
 }
 

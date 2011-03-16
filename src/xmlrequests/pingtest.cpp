@@ -1,6 +1,6 @@
 #include <QtXml/qdom.h>
 
-#include "pingtest.h"
+#include "xmlrequests/pingtest.h"
 
 
 PingTest::PingTest(QString* _host, int* _port, QString* _usr, QString* _pss)
@@ -22,9 +22,8 @@ void PingTest::checkStatus()
 {
     if(respXML->namedItem("subsonic-response").toElement()
         .attribute("status", "NULL").toLocal8Bit() == "ok") {
-        //printf("Server responds to ping: A-Okay\n");
+        emit serverPingOk();
     }
-
-    emit serverPingOk();
-    emit gedditWhileItsHot();
+    else
+        emit serverPingServerError();
 }

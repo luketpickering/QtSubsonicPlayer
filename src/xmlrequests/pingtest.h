@@ -2,7 +2,7 @@
 #define PINGTEST_H
 
 #include <QObject>
-#include "subrequestxml.h"
+#include "xmlrequests/subrequestxml.h"
 
 
 class PingTest
@@ -15,6 +15,8 @@ public:
 
 signals:
 	void serverPingOk();
+        void serverPingFailed();
+        void serverPingServerError();
 
 	public slots:
 		void checkStatus();

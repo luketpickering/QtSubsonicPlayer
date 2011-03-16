@@ -15,6 +15,7 @@ class SubRequestXML
 
 public:
 		//Member functions
+    QDomDocument* respXML;
 		
 signals:
     void gedditWhileItsHot();
@@ -37,9 +38,6 @@ protected:
     QNetworkRequest* netReq;
     QNetworkAccessManager* netAMan;
     QNetworkReply* netReply;
-
-
-    QDomDocument* respXML;
 
     bool isHTTPRedirect();
     int isHealthySubResp();
