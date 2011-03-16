@@ -17,7 +17,6 @@ public:
 signals:
 
 private slots:
-    void printResp();
 
 private:
     RetrieveIndex();

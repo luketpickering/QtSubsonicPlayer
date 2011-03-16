@@ -73,8 +73,7 @@ void SubRequestXML::recievedData()
         }
     }
     else {
-        printf("Http error code:%i -"
-               + netReply->errorString().toLocal8Bit(), netReply->error());
+        //add some logging here
     }
 }
 

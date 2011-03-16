@@ -15,6 +15,8 @@ public:
 
 signals:
 	void serverPingOk();
+        void serverPingFailed();
+        void serverPingServerError();
 
 	public slots:
 		void checkStatus();

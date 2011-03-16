@@ -9,7 +9,7 @@ class RetrieveDirectory : public SubRequestXML
 {
 	Q_OBJECT
 public:
-	RetrieveDirectory(QString* _host, int* _port, QString* _usr, QString* _pss,QString* _dirID);
+        RetrieveDirectory(QString* _host, int* _port, QString* _usr, QString* _pss,const QString& _dirID);
 	void retrieve();
 
 signals:

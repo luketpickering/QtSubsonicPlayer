@@ -15,10 +15,5 @@ void RetrieveIndex::retrieve()
 {
     makeXMLReq();
     connect(this,SIGNAL(healthyRespRecieved()),
-            this, SLOT(printResp()));
-}
-
-void RetrieveIndex::printResp()
-{
-    //puts(respXML->toString().toLocal8Bit());
-}
+            this, SIGNAL(gedditWhileItsHot()));
+};

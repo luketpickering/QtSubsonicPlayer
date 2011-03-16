@@ -22,9 +22,8 @@ void PingTest::checkStatus()
 {
     if(respXML->namedItem("subsonic-response").toElement()
         .attribute("status", "NULL").toLocal8Bit() == "ok") {
-        //printf("Server responds to ping: A-Okay\n");
+        emit serverPingOk();
     }
-
-    emit serverPingOk();
-    emit gedditWhileItsHot();
+    else
+        emit serverPingServerError();
 }
