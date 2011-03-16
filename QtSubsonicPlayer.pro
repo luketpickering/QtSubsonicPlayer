@@ -18,15 +18,17 @@ HEADERS += src/connecttoserverdialog.h \
     src/mainwindow.h \
     src/xmlrequests/pingtest.h \
     src/xmlrequests/retrieveindex.h \
-    src/xmlrequests/subrequestxml.h
+    src/xmlrequests/subrequestxml.h \
 FORMS += src/connecttoserverdialog.ui \
-    src/mainwindow.ui
+    src/mainwindow.ui \
+    src/xmlrequests/retrievedirectory.h
 SOURCES += src/connecttoserverdialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/xmlrequests/pingtest.cpp \
     src/xmlrequests/retrieveindex.cpp \
-    src/xmlrequests/subrequestxml.cpp
+    src/xmlrequests/subrequestxml.cpp \
+    src/xmlrequests/retrievedirectory.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \

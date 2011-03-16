@@ -3,7 +3,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtXml>
 #include <QUrl>
-#include "subrequestxml.h"
+#include "xmlrequests/subrequestxml.h"
 
 // SubRequest Methods *********************************************************
 

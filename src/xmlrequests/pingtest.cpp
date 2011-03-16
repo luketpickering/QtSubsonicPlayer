@@ -1,6 +1,6 @@
 #include <QtXml/qdom.h>
 
-#include "pingtest.h"
+#include "xmlrequests/pingtest.h"
 
 
 PingTest::PingTest(QString* _host, int* _port, QString* _usr, QString* _pss)

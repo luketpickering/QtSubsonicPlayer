@@ -1,4 +1,4 @@
-#include "retrieveindex.h"
+#include "xmlrequests/retrieveindex.h"
 
 RetrieveIndex::RetrieveIndex(QString* _host,
                              int* _port,

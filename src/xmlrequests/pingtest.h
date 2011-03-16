@@ -2,7 +2,7 @@
 #define PINGTEST_H
 
 #include <QObject>
-#include "subrequestxml.h"
+#include "xmlrequests/subrequestxml.h"
 
 
 class PingTest

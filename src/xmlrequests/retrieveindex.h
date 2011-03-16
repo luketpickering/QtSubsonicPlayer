@@ -2,7 +2,7 @@
 #define RETRIEVEINDEX_H
 
 #include <QObject>
-#include "subrequestxml.h"
+#include "xmlrequests/subrequestxml.h"
 
 
 class RetrieveIndex
