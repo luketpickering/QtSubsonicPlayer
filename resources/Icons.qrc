@@ -1,15 +1,15 @@
 <RCC>
-  <qresource prefix="Media Icons">
-    <file>media-playback-pause.png</file>
-    <file>media-playback-start.png</file>
-    <file>media-playback-stop.png</file>
-    <file>media-record.png</file>
-    <file>media-seek-backward.png</file>
-    <file>media-seek-forward.png</file>
-    <file>media-skip-backward.png</file>
-    <file>media-skip-forward.png</file>
-  </qresource>
-  <qresource prefix="Application Icons">
-    <file>subsonic-icon.png</file>
-  </qresource>
+    <qresource prefix="/Media Icons">
+        <file>media-playback-pause.png</file>
+        <file>media-playback-start.png</file>
+        <file>media-playback-stop.png</file>
+        <file>media-record.png</file>
+        <file>media-seek-backward.png</file>
+        <file>media-seek-forward.png</file>
+        <file>media-skip-backward.png</file>
+        <file>media-skip-forward.png</file>
+    </qresource>
+    <qresource prefix="/Application Icons">
+        <file>subsonic-icon.png</file>
+    </qresource>
 </RCC>

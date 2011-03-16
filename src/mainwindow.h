@@ -40,6 +40,8 @@ private slots:
     void about();
     void setServerData(QString&, QString&, QString&);
     void playPause(bool);
+    void changePlayButtonIcon(bool);
+    void setTimeElapsedLabel(int);
     void setTimeLabels(qint64);
     void setTrackData(qint64);
     void setSliderMaximum(Phonon::State,Phonon::State);

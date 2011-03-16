@@ -78,8 +78,6 @@ void MainWindow::setPhonon()
 
     tickInterval = 1000;
     this->mediaObject->setTickInterval(tickInterval);
-    connect(mediaObject, SIGNAL(tick(qint64)),
-            this, SLOT(setTimeLabels(qint64)));
 }
 
 
@@ -93,6 +91,7 @@ void MainWindow::setMediaActions()
 {
     // set up "Play/Pause" button
     connect(playButton, SIGNAL(toggled(bool)), this, SLOT(playPause(bool)));
+    connect(playButton, SIGNAL(toggled(bool)), this, SLOT(changePlayButtonIcon(bool)));
     connect(this, SIGNAL(mediaPlay()), mediaObject, SLOT(play()));
     connect(this, SIGNAL(mediaPause()), mediaObject, SLOT(pause()));
 
@@ -111,10 +110,15 @@ void MainWindow::setMediaActions()
             this, SLOT(setSliderMaximum(Phonon::State,Phonon::State)));
     connect(mediaObject, SIGNAL(tick(qint64)),
             this, SLOT(setTrackData(qint64)));
-    /*
     connect(trackSlider, SIGNAL(valueChanged(int)),
             this, SLOT(seekTrack(int)));
-    */
+    connect(trackSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(setTimeElapsedLabel(int)));
+
+
+    // set up time labels
+    connect(mediaObject, SIGNAL(tick(qint64)),
+            this, SLOT(setTimeLabels(qint64)));
 }
 
 
@@ -130,6 +134,21 @@ void MainWindow::playPause(bool pp)
     }
     if (!pp) {
         emit mediaPause();
+    }
+}
+
+
+/*
+  changePlayButtonIcon(bool) is a slot the changes the icon on the play/pause
+  button depending on whether the button is checked or not.
+*/
+void MainWindow::changePlayButtonIcon(bool b)
+{
+    if (b == false) {
+        playButton->setIcon(QIcon(":/Media Icons/media-playback-start.png"));
+    }
+    else if (b == true) {
+        playButton->setIcon(QIcon(":/Media Icons/media-playback-pause.png"));
     }
 }
 
@@ -168,6 +187,27 @@ void MainWindow::setTimeLabels(qint64 _time)
 
 
 /*
+  setTimeElapsedLabel(int) is a slot which sets the timeElapsedLabel text
+  independently of the timeLeftLabel.
+*/
+void MainWindow::setTimeElapsedLabel(int _time)
+{
+    QString timeElapsed;
+
+    timeElapsed.append(QString::number(_time/60));
+    timeElapsed.append(":");
+
+    if (_time%60 < 10) {
+        timeElapsed.append("0");
+    }
+
+    timeElapsed.append(QString::number(_time%60));
+
+    timeElapsedLabel->setText(timeElapsed);
+}
+
+
+/*
   setTrackSliderPosition(qint64) is a slot which changes the position of
   trackSlider depending on the time passed to it (in ms).
 */
@@ -178,7 +218,12 @@ void MainWindow::setTrackData(qint64 _time)
 
     // set nowPlayingLabel to the current file name - this needs to be
     // improved to read ID3 tags to display <Artist Name> - <Track Name>
-    nowPlayingLabel->setText(mediaObject->currentSource().fileName());
+    nowPlayingLabel->setText(mediaObject->metaData("ARTIST").at(0) + " - "
+                             + mediaObject->metaData("TITLE").at(0));
+
+    this->setWindowTitle("Subsonic Player - "
+                         + mediaObject->metaData("ARTIST").at(0) + " - "
+                         + mediaObject->metaData("TITLE").at(0));
 }
 
 
@@ -198,12 +243,20 @@ void MainWindow::setSliderMaximum(Phonon::State _a, Phonon::State _b)
 /*
   seekTrack(int) is a slot which take input int from trackSlider which
   represents a time in seconds, and converts its to qint64 and milliseconds
-  in order to seek to the given time.
+  in order to seek to the given time. The if-else if code is needed to prevent
+  the normal movement of the slider with the song from seeking every second.
 */
 void MainWindow::seekTrack(int _time)
 {
-    mediaObject->seek(_time*tickInterval);
+    if ((_time*tickInterval - mediaObject->currentTime() > 2000)) {
+        mediaObject->seek(_time*tickInterval);
+    }
+
+    else if ((mediaObject->currentTime() - _time*tickInterval > 2000)) {
+        mediaObject->seek(_time*tickInterval);
+    }
 }
+
 
 /*
   previousPressed() is a slot which is connected to previousButton->clicked()
