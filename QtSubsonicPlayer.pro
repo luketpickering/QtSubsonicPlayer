@@ -20,7 +20,8 @@ HEADERS += src/connecttoserverdialog.h \
     src/xmlrequests/retrieveindex.h \
     src/xmlrequests/subrequestxml.h \
     src/xmlrequests/retrievedirectory.h \
-    src/xmlrequests/xmlcachehandler.h
+    src/xmlrequests/xmlcachehandler.h \
+    src/mediaplayer.h
 FORMS += src/connecttoserverdialog.ui \
     src/mainwindow.ui
 SOURCES += src/connecttoserverdialog.cpp \
@@ -30,7 +31,8 @@ SOURCES += src/connecttoserverdialog.cpp \
     src/xmlrequests/retrieveindex.cpp \
     src/xmlrequests/subrequestxml.cpp \
     src/xmlrequests/retrievedirectory.cpp \
-    src/xmlrequests/xmlcachehandler.cpp
+    src/xmlrequests/xmlcachehandler.cpp \
+    src/mediaplayer.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \
@@ -41,7 +43,8 @@ OTHER_FILES += resources/media-skip-forward.png \
     resources/media-playback-start.png \
     resources/media-playback-pause.png \
     resources/subsonic-icon.png \
-    README.txt
+    README.txt \
+    README
 
 # Output
 MOC_DIR += ./generatedfiles

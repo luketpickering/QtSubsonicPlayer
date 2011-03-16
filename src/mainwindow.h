@@ -8,6 +8,8 @@
 #include "xmlrequests/pingtest.h"
 
 class ConnectToServerDialog;
+class MediaPlayer;
+class QBuffer;
 
 class MainWindow
     : public QMainWindow,
@@ -20,10 +22,9 @@ public:
     QString username;
     QString password;
 
-    Phonon::MediaObject *mediaObject;
-    Phonon::AudioOutput *audioOutput;
+    MediaPlayer *mediaPlayer;
 
-    int tickInterval;
+    QBuffer *currentTrackBuffer;
 
     MainWindow();
 
@@ -40,15 +41,7 @@ private slots:
     void connectToServer();
     void about();
     void setServerData(QString&, QString&, QString&);
-    void playPause(bool);
-    void changePlayButtonIcon(bool);
-    void setTimeElapsedLabel(int);
-    void setTimeLabels(qint64);
-    void setTrackData(qint64);
-    void setSliderMaximum(Phonon::State,Phonon::State);
-    void seekTrack(int);
-    void previousPressed();
-    void stopPressed();
+    void setTimeElapsedLabel(qint64); 
 };
 
 #endif // MAINWINDOW_H
