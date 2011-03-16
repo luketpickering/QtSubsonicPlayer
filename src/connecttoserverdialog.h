@@ -4,8 +4,9 @@
 #include <QDialog>
 #include "ui_connecttoserverdialog.h"
 
-class ConnectToServerDialog : public QDialog,
-                              public Ui::ConnectToServerDialog
+class ConnectToServerDialog
+    : public QDialog,
+      public Ui::ConnectToServerDialog
 {
     Q_OBJECT
 

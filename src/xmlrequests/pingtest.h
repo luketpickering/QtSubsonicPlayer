@@ -5,7 +5,8 @@
 #include "subrequestxml.h"
 
 
-class PingTest : public SubRequestXML
+class PingTest
+    : public SubRequestXML
 {
 	Q_OBJECT
 public:

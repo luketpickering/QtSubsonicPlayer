@@ -5,21 +5,22 @@
 #include "subrequestxml.h"
 
 
-class RetrieveIndex : public SubRequestXML
+class RetrieveIndex
+    : public SubRequestXML
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	RetrieveIndex(QString* _host, int* _port, QString* _usr, QString* _pss);
-	void retrieve();
+    RetrieveIndex(QString* _host, int* _port, QString* _usr, QString* _pss);
+    void retrieve();
 
 signals:
 
 private slots:
-	void printResp();
+    void printResp();
 
 private:
-	RetrieveIndex();
-
+    RetrieveIndex();
 };
 
 

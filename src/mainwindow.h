@@ -8,7 +8,9 @@
 
 class ConnectToServerDialog;
 
-class MainWindow : public QMainWindow, public Ui::MainWindow
+class MainWindow
+    : public QMainWindow,
+      public Ui::MainWindow
 {
     Q_OBJECT
 
@@ -43,6 +45,7 @@ private slots:
     void setSliderMaximum(Phonon::State,Phonon::State);
     void seekTrack(int);
     void previousPressed();
+    void stopPressed();
 };
 
 #endif // MAINWINDOW_H

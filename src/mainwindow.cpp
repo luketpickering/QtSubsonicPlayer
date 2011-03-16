@@ -99,6 +99,7 @@ void MainWindow::setMediaActions()
 
     // set up "Stop" button
     connect(stopButton, SIGNAL(clicked()), mediaObject, SLOT(stop()));
+    connect(stopButton, SIGNAL(clicked()), this, SLOT(stopPressed()));
 
 
     // set up Next/Previous buttons
@@ -110,8 +111,10 @@ void MainWindow::setMediaActions()
             this, SLOT(setSliderMaximum(Phonon::State,Phonon::State)));
     connect(mediaObject, SIGNAL(tick(qint64)),
             this, SLOT(setTrackData(qint64)));
+    /*
     connect(trackSlider, SIGNAL(valueChanged(int)),
             this, SLOT(seekTrack(int)));
+    */
 }
 
 
@@ -217,6 +220,15 @@ void MainWindow::previousPressed()
     else {
         mediaObject->seek(0);
     }
+}
+
+/*
+  stopPressed() is a lot which is connect to stopButton->clicked() which
+  resets the state of the playButton when stop is pressed.
+*/
+void MainWindow::stopPressed()
+{
+    playButton->setChecked(false);
 }
 
 // END: Media Related Methods and Slots ***************************************
