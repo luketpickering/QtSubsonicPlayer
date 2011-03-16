@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "xmlrequests/xmlcachehandler.h"
+#include "xmlrequests/pingtest.h"
 
 // constructor for MainWindow
 MainWindow::MainWindow()
@@ -16,7 +17,6 @@ MainWindow::MainWindow()
     this->setPhonon();
     this->setMediaActions();
 
-    //XMLCacheHandler xch(this);
 
     // set the MediaSource (file in folder for now)
     Phonon::MediaSource mediaSource("C:/test.mp3");

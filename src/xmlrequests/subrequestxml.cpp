@@ -51,6 +51,12 @@ void SubRequestXML::makeXMLReq()
     puts(netReq->url().toString().toLocal8Bit());
     netReply = netAMan->get(*netReq);
     connect(netReply,SIGNAL(finished()), this, SLOT(recievedData()));
+    connect(netReply,SIGNAL(readyRead()), this, SLOT(test()));
+}
+
+void SubRequestXML::test()
+{
+    int bla = 2;
 }
 
 void SubRequestXML::recievedData()

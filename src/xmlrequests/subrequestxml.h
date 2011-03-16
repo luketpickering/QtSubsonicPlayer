@@ -24,6 +24,7 @@ signals:
 
 private slots:
     void recievedData();
+    void test();
 	
 protected:
     //Data Members

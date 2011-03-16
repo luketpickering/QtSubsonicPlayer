@@ -20,11 +20,13 @@ XMLCacheHandler::XMLCacheHandler(QObject* parent) : QObject(parent)
 
 void XMLCacheHandler::getNewIndexes()
 {
-    QString host_("hotblack.subsonic.org");
-    QString usr_("49MR");
-    QString pss_("49");
-    int port = 0;
-    RetrieveIndex* ri = new RetrieveIndex(&host_,&port,&usr_,&pss_);
+    //these are a mem leak atm - fix
+    QString* host_ = new QString("hotblack.subsonic.org");
+    QString* usr_ = new QString("49MR");
+    QString* pss_ = new QString("49");
+    int* port = new int(0);
+
+    RetrieveIndex* ri = new RetrieveIndex(host_,port,usr_,pss_);
     connect(ri,SIGNAL(gedditWhileItsHot()),this, SLOT(saveNewCache()));
     ri->retrieve();
 }

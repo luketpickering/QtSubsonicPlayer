@@ -5,6 +5,7 @@
 #include <Phonon/MediaObject>
 #include <Phonon/AudioOutput>
 #include "ui_mainwindow.h"
+#include "xmlrequests/pingtest.h"
 
 class ConnectToServerDialog;
 
