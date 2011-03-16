@@ -96,14 +96,22 @@ void MainWindow::setMediaActions()
     connect(this, SIGNAL(mediaPlay()), mediaObject, SLOT(play()));
     connect(this, SIGNAL(mediaPause()), mediaObject, SLOT(pause()));
 
+
     // set up "Stop" button
     connect(stopButton, SIGNAL(clicked()), mediaObject, SLOT(stop()));
+
+
+    // set up Next/Previous buttons
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(previousPressed()));
+
 
     // set up Slider
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
             this, SLOT(setSliderMaximum(Phonon::State,Phonon::State)));
     connect(mediaObject, SIGNAL(tick(qint64)),
-            this, SLOT(setTrackSliderPostition(qint64)));
+            this, SLOT(setTrackData(qint64)));
+    connect(trackSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(seekTrack(int)));
 }
 
 
@@ -160,7 +168,7 @@ void MainWindow::setTimeLabels(qint64 _time)
   setTrackSliderPosition(qint64) is a slot which changes the position of
   trackSlider depending on the time passed to it (in ms).
 */
-void MainWindow::setTrackSliderPostition(qint64 _time)
+void MainWindow::setTrackData(qint64 _time)
 {
     int position = _time/tickInterval;
     trackSlider->setValue(position);
@@ -180,6 +188,34 @@ void MainWindow::setSliderMaximum(Phonon::State _a, Phonon::State _b)
 {
     if (_a == 0 || _b==0) {
         trackSlider->setMaximum(mediaObject->totalTime()/tickInterval);
+    }
+}
+
+
+/*
+  seekTrack(int) is a slot which take input int from trackSlider which
+  represents a time in seconds, and converts its to qint64 and milliseconds
+  in order to seek to the given time.
+*/
+void MainWindow::seekTrack(int _time)
+{
+    mediaObject->seek(_time*tickInterval);
+}
+
+/*
+  previousPressed() is a slot which is connected to previousButton->clicked()
+  which resets the track to the beginning if it is more than 2 seconds into
+  the song, or changes to the previous track if less, i.e. to change to a
+  previous track you double click.
+*/
+void MainWindow::previousPressed()
+{
+    if (mediaObject->remainingTime() > (mediaObject->totalTime() - 2000))
+    {
+        // previous track
+    }
+    else {
+        mediaObject->seek(0);
     }
 }
 

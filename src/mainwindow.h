@@ -39,8 +39,10 @@ private slots:
     void setServerData(QString&, QString&, QString&);
     void playPause(bool);
     void setTimeLabels(qint64);
-    void setTrackSliderPostition(qint64);
+    void setTrackData(qint64);
     void setSliderMaximum(Phonon::State,Phonon::State);
+    void seekTrack(int);
+    void previousPressed();
 };
 
 #endif // MAINWINDOW_H
