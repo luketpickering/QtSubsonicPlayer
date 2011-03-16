@@ -4,7 +4,9 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setApplicationName("QtSubsonicPlayer");
+
     MainWindow *mainWindow = new MainWindow;
     mainWindow->show();
-    app.exec();
+    return app.exec();
 }
