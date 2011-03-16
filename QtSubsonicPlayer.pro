@@ -19,9 +19,9 @@ HEADERS += src/connecttoserverdialog.h \
     src/xmlrequests/pingtest.h \
     src/xmlrequests/retrieveindex.h \
     src/xmlrequests/subrequestxml.h \
-FORMS += src/connecttoserverdialog.ui \
-    src/mainwindow.ui \
     src/xmlrequests/retrievedirectory.h
+FORMS += src/connecttoserverdialog.ui \
+    src/mainwindow.ui
 SOURCES += src/connecttoserverdialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
