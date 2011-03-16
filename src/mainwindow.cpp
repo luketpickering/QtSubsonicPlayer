@@ -13,13 +13,12 @@
 MainWindow::MainWindow()
 {
     setupUi(this);
-    this->setMenuActions();
-    this->setPhonon();
-    this->setMediaActions();
-
+    setMenuActions();
+    setPhonon();
+    setMediaActions();
 
     // set the MediaSource (file in folder for now)
-    Phonon::MediaSource mediaSource("C:/test.mp3");
+    Phonon::MediaSource mediaSource("gravity.mp3");
     mediaObject->setCurrentSource(mediaSource);
 }
 
@@ -68,6 +67,7 @@ void MainWindow::about()
 
 // Media Related Methods and Slots ********************************************
 
+
 /*
   setPhonon() is a function create the Phonon MediaObject and AudioOutput
   and links them together. It sets mediaObject's tickInterval and connects
@@ -75,12 +75,13 @@ void MainWindow::about()
 */
 void MainWindow::setPhonon()
 {
-    this->mediaObject = new Phonon::MediaObject(this);
-    this->audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
-    Phonon::createPath(this->mediaObject, this->audioOutput);
+    mediaObject = new Phonon::MediaObject(this);
+    audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
+    Phonon::createPath(mediaObject, audioOutput);
 
+    // set the tickinterval to 1000ms
     tickInterval = 1000;
-    this->mediaObject->setTickInterval(tickInterval);
+    mediaObject->setTickInterval(tickInterval);
 }
 
 
@@ -318,9 +319,9 @@ void MainWindow::setServerData(QString &_srvr,
                                QString &_uname,
                                QString &_passwd)
 {
-    this->serverpath = _srvr;
-    this->username = _uname;
-    this->password = _passwd;
+    serverpath = _srvr;
+    username = _uname;
+    password = _passwd;
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************

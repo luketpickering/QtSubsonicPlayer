@@ -56,7 +56,7 @@ void SubRequestXML::makeXMLReq()
 
 void SubRequestXML::test()
 {
-    int bla = 2;
+    // int bla = 2;
 }
 
 void SubRequestXML::recievedData()
