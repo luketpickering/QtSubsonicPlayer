@@ -1,5 +1,5 @@
-#ifndef SUBREQUEST_H
-#define SUBREQUEST_H
+#ifndef SUBREQUESTXML_H
+#define SUBREQUESTXML_H
 
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkAccessManager>
@@ -20,8 +20,8 @@ signals:
 	void healthyRespRecieved(QDomDocument* _responsexml);
 	void globalHostStringChanged();
 
-	private slots:
-		void handleRawResponse();
+private slots:
+	void handleRawResponse();
 
 
 protected:

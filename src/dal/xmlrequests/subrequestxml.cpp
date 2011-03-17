@@ -104,7 +104,6 @@ bool SubRequestXML::isHttpRedirect()
 			redirectedAlready_ = false;
 		}
 
-
 		emit globalHostStringChanged();
 		printf(netReq.url().host().toLocal8Bit()
             + " requests redirect to: " + redirect_.host().toLocal8Bit() + "\n");
