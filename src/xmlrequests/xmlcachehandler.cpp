@@ -1,48 +1,64 @@
 #include "xmlcachehandler.h"
 #include <QFile>
-#include "xmlrequests/retrieveindex.h"
+#include "retrieveindex.h"
+#include "connectiondata.h"
+#include "retrievedirectory.h"
+
+XMLCacheHandler::XMLCacheHandler(ConnectionData* _cd, QObject* parent) : QObject(parent)
+{
+	conndata = _cd;
+	gotConnData = true;
+}
 
 XMLCacheHandler::XMLCacheHandler(QObject* parent) : QObject(parent)
 {
-    QFile file("xmlcache.xml");
-    file.open(QIODevice::ReadWrite);
-
-    cacheFile = new QDomDocument("cache");
-    if(!cacheFile->setContent(file.readAll()))
-    {
-        file.remove();
-        delete cacheFile;
-        getNewIndexes();
-    }
-    else
-        file.close();
+	gotConnData = false;
 }
 
-void XMLCacheHandler::getNewIndexes()
+void XMLCacheHandler::hardResetCache()
 {
-    //these are a mem leak atm - fix
-    QString* host_ = new QString("hotblack.subsonic.org");
-    QString* usr_ = new QString("49MR");
-    QString* pss_ = new QString("49");
-    int* port = new int(0);
+	if(gotConnData)
+	{
+		QFile file("xmlcache.xml");
+		file.open(QIODevice::ReadWrite | QIODevice::Text);
+		file.remove();
 
-    RetrieveIndex* ri = new RetrieveIndex(host_,port,usr_,pss_);
-    connect(ri,SIGNAL(gedditWhileItsHot()),this, SLOT(saveNewCache()));
-    ri->retrieve();
+		RetrieveIndex* ri = new RetrieveIndex(conndata,this->parent());
+		connect(ri,SIGNAL(gedditWhileItsHot(QDomDocument*)),this, SLOT(saveNewCache(QDomDocument*)));
+		ri->retrieve();
+
+	}
 }
 
-void XMLCacheHandler::saveNewCache()
+
+void XMLCacheHandler::saveNewCache(QDomDocument* _responsexml)
 {
 
     QFile file("xmlcache.xml");
-    file.open(QIODevice::WriteOnly);
-    file.write(((RetrieveIndex*) sender())->respXML->toString().toLocal8Bit());
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+	file.write(_responsexml->toString(3).toUtf8());
     file.flush();
     file.close();
-    delete sender();
-    file.open(QIODevice::ReadOnly);
+
     cacheFile = new QDomDocument("cache");
-    cacheFile->setContent(file.readAll());
+    cacheFile->setContent(_responsexml->toString(3).toUtf8());
+
+
+	emit cacheReset();
+}
+
+void XMLCacheHandler::getArtist(QString _name)
+{
+	//QString _name("Arctic Monkeys");
+	QDomNodeList indexer = cacheFile->elementsByTagName(QString("index"));
+
+	
+}
+
+void XMLCacheHandler::recievedDirectory(RetrieveDirectory* _rd, QDomNode* _nodeToAdd)
+{
+	//puts(_rd->respXML->toString().toUtf8());
 }
 
 

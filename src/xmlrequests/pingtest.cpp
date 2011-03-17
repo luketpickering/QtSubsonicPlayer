@@ -1,26 +1,26 @@
 #include <QtXml/qdom.h>
 
-#include "xmlrequests/pingtest.h"
+#include "pingtest.h"
 
 
-PingTest::PingTest(QString* _host, int* _port, QString* _usr, QString* _pss)
-    : SubRequestXML (_host, _port, _usr, _pss)
+PingTest::PingTest(ConnectionData* _conndata, QObject* parent)
+    : SubRequestXML (_conndata,parent)
 {
     endpointLocation = "rest/ping.view";
-    params.insert("v","1.5.0");
-    params.insert("c","lukesapp");
+	params.append(QPair<QString,QString>("v","1.5.0"));
+    params.append(QPair<QString,QString>("c","lukesapp"));
 }
 
 void PingTest::test()
 {
     makeXMLReq();
-    connect(this, SIGNAL(healthyRespRecieved()),
-            this, SLOT(checkStatus()));
+    connect(this, SIGNAL(healthyRespRecieved(QDomDocument*)),
+            this, SLOT(checkStatus(QDomDocument*)));
 }
 
-void PingTest::checkStatus()
+void PingTest::checkStatus(QDomDocument* _respXML)
 {
-    if(respXML->namedItem("subsonic-response").toElement()
+    if(_respXML->namedItem("subsonic-response").toElement()
         .attribute("status", "NULL").toLocal8Bit() == "ok") {
         emit serverPingOk();
     }

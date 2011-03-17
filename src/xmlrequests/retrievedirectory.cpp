@@ -1,15 +1,16 @@
-#include "xmlrequests/retrievedirectory.h"
+#include "retrievedirectory.h"
 
-RetrieveDirectory::RetrieveDirectory(QString* _host, int* _port, QString* _usr, QString* _pss, const QString& _dirID) : SubRequestXML (_host, _port, _usr, _pss)
+RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent) 
+	: SubRequestXML (_conndata,parent)
 {
 	endpointLocation = "rest/getMusicDirectory.view";
-	params.insert("v","1.5.0");
-	params.insert("c","lukesapp");
-        params.insert("id",_dirID);
+	params.append(QPair<QString,QString>("v","1.5.0"));
+	params.append(QPair<QString,QString>("c","lukesapp"));
+    params.append(QPair<QString,QString>("id",_dirID));
 }
 
 void RetrieveDirectory::retrieve()
 {
 	makeXMLReq();
-        connect(this,SIGNAL(healthyRespRecieved()), this, SIGNAL(gedditWhileItsHot()));
+        connect(this,SIGNAL(healthyRespRecieved(QDomDocument*)), this, SIGNAL(gedditWhileItsHot(QDomDocument*)));
 }

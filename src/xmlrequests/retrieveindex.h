@@ -2,7 +2,9 @@
 #define RETRIEVEINDEX_H
 
 #include <QObject>
-#include "xmlrequests/subrequestxml.h"
+#include "subrequestxml.h"
+#include "connectiondata.h"
+
 
 
 class RetrieveIndex
@@ -11,7 +13,7 @@ class RetrieveIndex
     Q_OBJECT
 
 public:
-    RetrieveIndex(QString* _host, int* _port, QString* _usr, QString* _pss);
+    RetrieveIndex(ConnectionData* _conndata, QObject* parent);
     void retrieve();
 
 signals:

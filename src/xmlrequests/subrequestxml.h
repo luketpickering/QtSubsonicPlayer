@@ -7,48 +7,51 @@
 #include <QObject>
 #include <QUrl>
 #include <QtXml/qdom.h>
+#include "connectiondata.h"
 
-class SubRequestXML
-    : public QObject
+
+class SubRequestXML: public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
-public:
-		//Member functions
-    QDomDocument* respXML;
-		
+
 signals:
-    void gedditWhileItsHot();
-    void healthyRespRecieved();
-    void globalHostStringChanged();
+	void gedditWhileItsHot(QDomDocument* _responsexml);
+	void healthyRespRecieved(QDomDocument* _responsexml);
+	void globalHostStringChanged();
 
-private slots:
-    void recievedData();
-    void test();
-	
+	private slots:
+		void handleRawResponse();
+
+
 protected:
-    //Data Members
-    QString* host;
-    QString* usr;
-    QString* pss;
-    int* port;
+	//------Members
+	QList<QPair<QString, QString>> params;
+	QString endpointLocation;
 
-    QMap<QString, QString> params;
-    QString endpointLocation;
+	//Network members
+	ConnectionData* connData;
+	QNetworkRequest netReq;
+	QNetworkAccessManager* netAMan;
+	QNetworkReply* netReply;
 
-    QNetworkRequest* netReq;
-    QNetworkAccessManager* netAMan;
-    QNetworkReply* netReply;
+	//------Functions
+	//Constructor
+	SubRequestXML(ConnectionData* _conndata, QObject* parent);
 
-    bool isHTTPRedirect();
-    int isHealthySubResp();
-    void makeXMLReq();
-    SubRequestXML(QString* _host, int* _port, QString* _usr, QString* _pss);
-
-    QUrl getUrl();
+	//Instance Functions
+	void makeXMLReq();
+	QUrl getUrl();
+	bool isHttpRedirect();
+	int isHealthySubResp();
 
 private:
-    SubRequestXML();
+	//------Members
+	QDomDocument* respXML;
+
+	//------Functions
+	//Constructor
+	SubRequestXML();
 
 };
 

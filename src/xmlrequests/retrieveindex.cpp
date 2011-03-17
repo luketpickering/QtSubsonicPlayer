@@ -1,19 +1,17 @@
-#include "xmlrequests/retrieveindex.h"
+#include "retrieveindex.h"
+#include "connectiondata.h"
 
-RetrieveIndex::RetrieveIndex(QString* _host,
-                             int* _port,
-                             QString* _usr,
-                             QString* _pss)
-    : SubRequestXML (_host, _port, _usr, _pss)
+RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent) 
+	: SubRequestXML (_conndata,parent)
 {
     endpointLocation = "rest/getIndexes.view";
-    params.insert("v","1.5.0");
-    params.insert("c","QtSubsonicPlayer");
+    params.append(QPair<QString,QString>("v","1.5.0"));
+    params.append(QPair<QString,QString>("c","QtSubsonicPlayer"));
 }
 
 void RetrieveIndex::retrieve()
 {
     makeXMLReq();
-    connect(this,SIGNAL(healthyRespRecieved()),
-            this, SIGNAL(gedditWhileItsHot()));
+    connect(this,SIGNAL(healthyRespRecieved(QDomDocument*)),
+            this, SIGNAL(gedditWhileItsHot(QDomDocument*)));
 };

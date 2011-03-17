@@ -2,7 +2,8 @@
 #define PINGTEST_H
 
 #include <QObject>
-#include "xmlrequests/subrequestxml.h"
+#include "subrequestxml.h"
+#include "connectiondata.h"
 
 
 class PingTest
@@ -10,16 +11,16 @@ class PingTest
 {
 	Q_OBJECT
 public:
-	PingTest(QString* _host, int* _port, QString* _usr, QString* _pss);
+	PingTest(ConnectionData* _conndata, QObject* parent);
 	void test();
 
 signals:
 	void serverPingOk();
-        void serverPingFailed();
-        void serverPingServerError();
+    void serverPingFailed();
+    void serverPingServerError();
 
-	public slots:
-		void checkStatus();
+	private slots:
+		void checkStatus(QDomDocument* _respXML);
 private:
 	PingTest();
 };
