@@ -19,7 +19,6 @@ SubRequestXML::SubRequestXML(ConnectionData* _conndata,QObject* parent )
 */
 SubRequestXML::~SubRequestXML()
 {
-	delete respXML;
 }
 
 /*

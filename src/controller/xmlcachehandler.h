@@ -14,51 +14,76 @@
 	which returns an error
 */
 
+//TODO -- a funking ridonculous amount of error mitigation
+
 class XMLCacheHandler: public QObject
 {
     Q_OBJECT
 
 public:
+	//----- Constructors
     XMLCacheHandler(ConnectionData* _cd, QObject* parent);
 	XMLCacheHandler::XMLCacheHandler(QObject* parent);
+	//----- Destructor
     ~XMLCacheHandler();
-    
 
-	/* To Implement
+	//----- Public request functions
+	void requestArtistList();
+	void requestArtistAlbums(QString _artistName);
+	void requestAlbum(QString _artistName, QString _albumName);
 
-	bool cacheIntegrity();
-
-	*/
-
+	//----- Public clean
 	void hardResetCache();
-	void getArtist(QString _name);
-	void getDirectory(QString _id);
 
 signals:
-    void cacheReset();
+
+	/*
+		Signals for external slots
+	*/
+	
+	void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
+	void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
+	void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
+	void noConnectionData();
+	void requireHardReset();
+
+	/*
+		Internal comms
+	*/
+    void cacheReady();
 	void readyToSaveNewDir(RetrieveDirectory* _rd, QDomNode* _nodeToAdd);
 
-public slots:
 
 private slots:
 	void saveNewCache(QDomDocument* _responsexml);
-	void recievedDirectory(QDomDocument*);
+	void recievedArtistsDir(QDomDocument*);
+	void recievedAlbum(QDomDocument*);
+	void returnArtistElement();
 
 private:
-
-	QString currentlySearching;
-	bool found;
-
+	//----- Members
+	//cache in memory
     QDomDocument* cacheFile;
+
+	//connection data
 	bool gotConnData;
-	bool loadCacheFromDisk();
-    void checkCacheAge();
 	ConnectionData* conndata;
-    XMLCacheHandler();
-	QDomElement findArtist(QString _name);
-	QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
-	QString _attrib, QString _value);
+
+	//----- Functions
+	//--IO
+	void loadCache();
+	bool loadCacheFromDisk();
 	bool saveCacheToDisk();
+
+	//--Constructor
+    XMLCacheHandler();
+
+	//--Cache querys
+	QDomElement findArtist(QString _name);
+
+	//--DOM Helper
+	QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
+		QString _attrib, QString _value);
 
 };
 
