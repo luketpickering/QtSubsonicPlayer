@@ -118,8 +118,6 @@ void SubRequest::handleRawResponse()
 		else
 		{
 			specificHandler();
-			netReply->close();
-			netReply->deleteLater();
 		}
     }
     else {

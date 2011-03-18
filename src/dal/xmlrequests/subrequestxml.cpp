@@ -11,7 +11,6 @@
 SubRequestXML::SubRequestXML(ConnectionData* _conndata,QObject* parent ) 
 	: SubRequest(_conndata, parent)
 {
-    netAMan = new QNetworkAccessManager(this);
 }
 
 /*
@@ -44,6 +43,8 @@ void SubRequestXML::specificHandler()
 	{
 		printf("Subsonic error code: %i\n",ec);
 	}
+	netReply->close();
+	netReply->deleteLater();
 }
 
 /*
