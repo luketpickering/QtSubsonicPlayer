@@ -1,4 +1,5 @@
 #include "retrievedirectory.h"
+#include <QtXml/QDomDocument>
 
 /*
 	Constructors
@@ -28,5 +29,7 @@ void RetrieveDirectory::retrieve()
 
 void RetrieveDirectory::specificXMLHandler(QDomDocument* _respXML)
 {
+
 	emit gedditWhileItsHot(_respXML);
+
 }

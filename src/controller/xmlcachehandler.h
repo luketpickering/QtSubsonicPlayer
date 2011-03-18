@@ -42,14 +42,23 @@ public slots:
 
 private slots:
 	void saveNewCache(QDomDocument* _responsexml);
-	void recievedDirectory(RetrieveDirectory* _rd, QDomNode* _nodeToAdd);
+	void recievedDirectory(QDomDocument*);
 
 private:
+
+	QString currentlySearching;
+	bool found;
+
     QDomDocument* cacheFile;
 	bool gotConnData;
+	bool loadCacheFromDisk();
     void checkCacheAge();
 	ConnectionData* conndata;
     XMLCacheHandler();
+	QDomElement findArtist(QString _name);
+	QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
+	QString _attrib, QString _value);
+	bool saveCacheToDisk();
 
 };
 
