@@ -3,8 +3,11 @@
 
 #include <QObject>
 #include "subrequestxml.h"
-#include "connectiondata.h"
+#include "../connectiondata.h"
 
+/*
+	Class to retrieve a directory contents XML from the server
+*/
 
 class RetrieveDirectory : public SubRequestXML
 {
@@ -13,12 +16,9 @@ public:
     RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent);
 	void retrieve();
 
-signals:
-
-private slots:
-
-private:
-	RetrieveDirectory();
+protected:
+	//implementing the base class' pure virtual function
+	void specificXMLHandler(QDomDocument* _respXML);
 
 };
 

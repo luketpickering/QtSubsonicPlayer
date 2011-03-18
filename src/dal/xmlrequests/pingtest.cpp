@@ -1,7 +1,9 @@
 #include <QtXml/qdom.h>
-
 #include "pingtest.h"
 
+/*
+	Constructors
+*/
 
 PingTest::PingTest(ConnectionData* _conndata, QObject* parent)
     : SubRequestXML (_conndata,parent)
@@ -11,19 +13,31 @@ PingTest::PingTest(ConnectionData* _conndata, QObject* parent)
     params.append(QPair<QString,QString>("c","lukesapp"));
 }
 
+/*
+	Public Methods
+*/
+
 void PingTest::test()
 {
-    makeXMLReq();
-    connect(this, SIGNAL(healthyRespRecieved(QDomDocument*)),
-            this, SLOT(checkStatus(QDomDocument*)));
+    makeRequest();
 }
 
-void PingTest::checkStatus(QDomDocument* _respXML)
+/*
+	Inherited virtual functions
+*/
+
+void PingTest::specificXMLHandler(QDomDocument* _respXML)
 {
+	//check the response xml says the server is okay
     if(_respXML->namedItem("subsonic-response").toElement()
-        .attribute("status", "NULL").toLocal8Bit() == "ok") {
+        .attribute("status", "NULL").toLocal8Bit() == "ok") 
+	{
         emit serverPingOk();
+		printf("server respondes: A - OKAY!\n");
     }
+	//otherwise emit why not 
+	//TODO -- emit the error string from the response aussi
     else
-        emit serverPingServerError();
+        emit serverPingServerError(_respXML->namedItem("subsonic-response").toElement()
+		.attribute("code", "0").toInt());
 }

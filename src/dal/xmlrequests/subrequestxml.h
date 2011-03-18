@@ -1,58 +1,37 @@
 #ifndef SUBREQUESTXML_H
 #define SUBREQUESTXML_H
 
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 #include <QObject>
-#include <QUrl>
 #include <QtXml/qdom.h>
-#include "connectiondata.h"
+#include "../connectiondata.h"
+#include "../subrequest.h"
 
+/*
+	Base class for all requests that return XML
+*/
 
-class SubRequestXML: public QObject
+class SubRequestXML: public SubRequest
 {
 	Q_OBJECT
 
-
 signals:
 	void gedditWhileItsHot(QDomDocument* _responsexml);
-	void healthyRespRecieved(QDomDocument* _responsexml);
-	void globalHostStringChanged();
-
-private slots:
-	void handleRawResponse();
-
 
 protected:
-	//------Members
-	QList<QPair<QString, QString>> params;
-	QString endpointLocation;
-
-	//Network members
-	ConnectionData* connData;
-	QNetworkRequest netReq;
-	QNetworkAccessManager* netAMan;
-	QNetworkReply* netReply;
-
-	//------Functions
-	//Constructor
-	SubRequestXML(ConnectionData* _conndata, QObject* parent);
-
 	//Instance Functions
-	void makeXMLReq();
-	QUrl getUrl();
-	bool isHttpRedirect();
+	SubRequestXML(ConnectionData* _conndata, QObject* parent);
+	SubRequestXML(QObject* parent);
+
 	int isHealthySubResp();
+	void specificHandler();
+
+	void virtual specificXMLHandler(QDomDocument* _respXML) = 0;
+
+	~SubRequestXML();
 
 private:
 	//------Members
 	QDomDocument* respXML;
-
-	//------Functions
-	//Constructor
-	SubRequestXML();
-
 };
 
 #endif

@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include "subrequestxml.h"
-#include "connectiondata.h"
+#include "../connectiondata.h"
 
-
+/*
+	Class to retrieve a folder index from server
+*/
 
 class RetrieveIndex
     : public SubRequestXML
@@ -16,12 +18,10 @@ public:
     RetrieveIndex(ConnectionData* _conndata, QObject* parent);
     void retrieve();
 
-signals:
+protected:
+	//implementing the base class' pure virtual function
+	void specificXMLHandler(QDomDocument* _respXML);
 
-private slots:
-
-private:
-    RetrieveIndex();
 };
 
 

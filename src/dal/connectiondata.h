@@ -3,6 +3,10 @@
 
 #include <qstring.h>
 
+/*
+	Holds the connection data for all server requests
+*/
+
 class ConnectionData
 {
 public:

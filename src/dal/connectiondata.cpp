@@ -1,6 +1,10 @@
 
 #include "connectiondata.h"
 
+/*
+	Constructors
+*/
+
 ConnectionData::ConnectionData()
 {
 	port = -1;

@@ -1,5 +1,9 @@
 #include "retrievedirectory.h"
 
+/*
+	Constructors
+*/
+
 RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent) 
 	: SubRequestXML (_conndata,parent)
 {
@@ -9,8 +13,20 @@ RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, 
     params.append(QPair<QString,QString>("id",_dirID));
 }
 
+/*
+	Public Methods
+*/
+
 void RetrieveDirectory::retrieve()
 {
-	makeXMLReq();
-        connect(this,SIGNAL(healthyRespRecieved(QDomDocument*)), this, SIGNAL(gedditWhileItsHot(QDomDocument*)));
+	makeRequest();
+}
+
+/*
+	Inherited Virtual Functions
+*/
+
+void RetrieveDirectory::specificXMLHandler(QDomDocument* _respXML)
+{
+	emit gedditWhileItsHot(_respXML);
 }

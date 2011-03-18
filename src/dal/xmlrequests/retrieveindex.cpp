@@ -1,5 +1,9 @@
 #include "retrieveindex.h"
-#include "connectiondata.h"
+#include "subrequestxml.h"
+
+/*
+	Constructors
+*/
 
 RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent) 
 	: SubRequestXML (_conndata,parent)
@@ -9,9 +13,21 @@ RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent)
     params.append(QPair<QString,QString>("c","QtSubsonicPlayer"));
 }
 
+/*
+	Public Methods
+*/
+
 void RetrieveIndex::retrieve()
 {
-    makeXMLReq();
-    connect(this,SIGNAL(healthyRespRecieved(QDomDocument*)),
-            this, SIGNAL(gedditWhileItsHot(QDomDocument*)));
+    makeRequest();
 };
+
+/*
+	Inherited Virtual Functions
+*/
+
+void RetrieveIndex::specificXMLHandler(QDomDocument* _respXML)
+{
+	emit gedditWhileItsHot(_respXML);
+}
+

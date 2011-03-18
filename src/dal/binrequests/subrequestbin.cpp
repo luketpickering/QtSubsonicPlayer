@@ -1,4 +1,5 @@
 #include "subrequestbin.h"
+#include "../subrequest.h"
 #include <qbuffer.h>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkAccessManager>
@@ -8,7 +9,7 @@
 
 
 SubRequestBin::SubRequestBin(ConnectionData* _conndata,QObject* parent ) 
-	: QObject(parent)
+	: SubRequest(_conndata,parent)
 {
 
 }

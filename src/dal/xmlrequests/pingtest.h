@@ -3,8 +3,13 @@
 
 #include <QObject>
 #include "subrequestxml.h"
-#include "connectiondata.h"
+#include "../connectiondata.h"
 
+/*
+	Class to perform a ping request to the server
+	Check the response and emit a signal depending
+	on the server response;
+*/
 
 class PingTest
     : public SubRequestXML
@@ -16,13 +21,12 @@ public:
 
 signals:
 	void serverPingOk();
-    void serverPingFailed();
-    void serverPingServerError();
+    void serverPingServerError(int _errorCode);
 
-	private slots:
-		void checkStatus(QDomDocument* _respXML);
-private:
-	PingTest();
+protected:
+	//implementing the base class' pure virtual function
+	void specificXMLHandler(QDomDocument* _respXML);
+		
 };
 
 #endif

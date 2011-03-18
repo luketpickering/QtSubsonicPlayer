@@ -1,8 +1,8 @@
 #include "xmlcachehandler.h"
 #include <QFile>
-#include "retrieveindex.h"
-#include "connectiondata.h"
-#include "retrievedirectory.h"
+#include "../dal/xmlrequests/retrieveindex.h"
+#include "../dal/connectiondata.h"
+#include "../dal/xmlrequests/retrievedirectory.h"
 
 XMLCacheHandler::XMLCacheHandler(ConnectionData* _cd, QObject* parent) : QObject(parent)
 {
