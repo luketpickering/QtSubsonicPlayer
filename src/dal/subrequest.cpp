@@ -3,9 +3,9 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtXml/QDomDocument>
 #include <QUrl>
-#include <stdio.h>
-
 #include "subrequest.h"
+
+#include <iostream>
 
 /*
 	Protected Constructors
@@ -41,6 +41,8 @@ void SubRequest::makeRequest()
     netReply = netAMan->get(netReq);
     connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
 	int bla = 2;
+
+        // again to shush the compiler warnings
         bla = 2;
 }
 
@@ -84,9 +86,8 @@ bool SubRequest::isHttpRedirect()
 on final response calls base class specificHandler*/
 void SubRequest::handleRawResponse()
 {
-
-    printf("Recieved response from: " + netReq.url().host()
-           .toLocal8Bit() + "\n");
+    std::cout << "Recieved response from: " << qPrintable(netReq.url().host())
+            << std::endl;
 
     if(netReply->error() == QNetworkReply::NoError ) 
 	{
@@ -108,8 +109,9 @@ void SubRequest::handleRawResponse()
 
 			emit globalHostStringChanged();
 
-			printf(netReq.url().host().toLocal8Bit()
-				+ " requests redirect to: " + redirect_.host().toLocal8Bit() + "\n");
+                        std::cout << qPrintable(netReq.url().host())
+                                << " requests redirect to: "
+                                << qPrintable(redirect_.host()) << std::endl;
 
 			//adjust the request
 			netReq.setUrl(getUrl());
@@ -124,6 +126,6 @@ void SubRequest::handleRawResponse()
 		}
     }
     else {
-		printf("Network Error - " + netReply->errorString().toLocal8Bit() );
+        std::cout << "Network Error - " << qPrintable(netReply->errorString()) << std::endl;
     }
 }

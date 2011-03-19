@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 Currently not quite an empty shell, but still definitely not functional!
+=======
+Currently this code can query a subsonic server for albums and tracks ! (not play them (yet))
+>>>>>>> 46ac51b1b2ce7036dc12daf69dd914199f0cc229

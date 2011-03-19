@@ -28,10 +28,8 @@ void SubRequestBin::specificHandler()
 	connect(netReply, SIGNAL(readyRead()), this, SLOT(writeToBuffer()));
 	connect(netReply, SIGNAL(downloadProgress(qint64,qint64)),
 		this, SLOT(writeToBuffer()));
-	connect(netReply, SIGNAL(downloadProgress(qint64,qint64)),
-		this, SLOT(writeToBuffer()));
 	connect(netReply, SIGNAL(finished()),
-		this, SLOT(wfinishedDownloading()));
+		this, SLOT(finishedDownloading()));
 
 }
 
@@ -40,12 +38,13 @@ void SubRequestBin::writeToBuffer()
 	if(netReply->bytesAvailable() > 0)
 	{
 		buf->write(netReply->read(1024));
+
 	}
 }
 
 void SubRequestBin::checkProgress(qint64 _cur, qint64 _tot)
 {
-	if(_cur > _tot*0.1)
+	if(_cur > 1024)
 	{
 		disconnect(netReply, SIGNAL(downloadProgress(qint64,qint64)),
 		this, SLOT(writeToBuffer()));

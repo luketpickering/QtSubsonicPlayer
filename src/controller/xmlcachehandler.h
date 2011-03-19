@@ -2,8 +2,10 @@
 #define XMLCACHEHANDLER_H
 #include <QtXml/QDomDocument>
 #include <QObject>
+#include <qbuffer.h>
 #include "../dal/connectiondata.h"
 #include "../dal/xmlrequests/retrievedirectory.h"
+#include <phonon>
 
 /*
 	Class to handle the XML cache. A fresh cache will start
@@ -21,80 +23,88 @@ class XMLCacheHandler: public QObject
     Q_OBJECT
 
 public:
-	//----- Constructors
+    //----- Constructors
     XMLCacheHandler(ConnectionData* _cd, QObject* parent);
     XMLCacheHandler(QObject* parent);
-	//----- Destructor
+
+    //----- Destructor
     ~XMLCacheHandler();
 
-	//----- Public request functions
-	void requestArtistList();
-	void requestArtistAlbums(QString _artistName);
-	void requestAlbum(QString _artistName, QString _albumName);
+    //TODO -- write ready to recieve
 
-        // XML Handling Functions (moved here by Michael)
-        QStringList *getValuesList(const QDomElement element,
-                                   const QString tagName,
-                                   const QString attributeName);
+    //----- Public request functions
+    void requestArtistList();
+    void requestArtistAlbums(QString _artistName);
+    void requestAlbum(QString _artistName, QString _albumName);
+    QString requestTrack(QString _artistName, QString _albumName, QString _trackName);
 
-        QString *getValue(const QDomElement element,
-                          const QString tagName,
-                          const QString attributeName,
-                          const QString attributeValue,
-                          const QString returnAttributeName);
+    // XML Handling Functions (moved here by mjn)
+    QStringList *getValuesList(const QDomElement element,
+                               const QString tagName,
+                               const QString attributeName);
 
-	//----- Public clean
-	void hardResetCache();
+    QString *getValue(const QDomElement element,
+                      const QString tagName,
+                      const QString attributeName,
+                      const QString attributeValue,
+                      const QString returnAttributeName);
+
+    //----- Public clean
+    void hardResetCache();
 
 signals:
 
-	/*
+    /*
 		Signals for external slots
 	*/
-	
-	void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
-	void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
-	void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
-	void noConnectionData();
-	void requireHardReset();
 
-	/*
+    void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
+    void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
+    void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
+    void noConnectionData();
+    void requireHardReset();
+    void cacheReset();
+
+    /*
 		Internal comms
 	*/
     void cacheReady();
-	void readyToSaveNewDir(RetrieveDirectory* _rd, QDomNode* _nodeToAdd);
+    void readyToSaveNewDir(RetrieveDirectory* _rd, QDomNode* _nodeToAdd);
 
 
 private slots:
-	void saveNewCache(QDomDocument* _responsexml);
-	void recievedArtistsDir(QDomDocument*);
-	void recievedAlbum(QDomDocument*);
-	void returnArtistElement();
+    void saveNewCache(QDomDocument* _responsexml);
+    void recievedArtistsDir(QDomDocument*);
+    void recievedAlbum(QDomDocument*);
+    void returnArtistElement();
+
+    void TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot);
+    void TESTPHONON(Phonon::State _ns,Phonon::State _os);
 
 private:
-	//----- Members
-	//cache in memory
+    //----- Members
+    //cache in memory
     QDomDocument* cacheFile;
 
-	//connection data
-	bool gotConnData;
-	ConnectionData* conndata;
+    //connection data
+    bool gotConnData;
+    ConnectionData* conndata;
 
-	//----- Functions
-	//--IO
-	void loadCache();
-	bool loadCacheFromDisk();
-	bool saveCacheToDisk();
+    //----- Functions
+    //--IO
+    void loadCache();
+    bool loadCacheFromDisk();
+    bool saveCacheToDisk();
 
-	//--Constructor
+    //--Constructor
     XMLCacheHandler();
 
-	//--Cache querys
-	QDomElement findArtist(QString _name);
+    //--Cache querys
+    QDomElement findArtist(QString _name);
 
-	//--DOM Helper
-	QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
-		QString _attrib, QString _value);
+    //--DOM Helper
+    QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
+                                              QString _attrib, QString _value);
 
 };
 
