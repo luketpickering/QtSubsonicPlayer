@@ -1,4 +1,6 @@
 #include <QtXml/qdom.h>
+#include <stdio.h>
+
 #include "pingtest.h"
 
 /*

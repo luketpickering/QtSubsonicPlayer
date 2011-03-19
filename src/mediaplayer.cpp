@@ -17,16 +17,13 @@ MediaPlayer::MediaPlayer(QObject *parent) :
     tickInterval = 1000;
     mediaObject->setTickInterval(tickInterval);
 
-    // set the MediaSource (single file on my (michael) server for now) if
-    // trying this outq
-    Phonon::MediaSource mediaSource("C:/test.mp3");
-
-                                    /*"http://93.97.48.32:4040/rest/stream.view?u="
+    // set the MediaSource (single file on my (michael) server for now)
+    Phonon::MediaSource mediaSource("http://localhost:4040/rest/stream.view?u="
                                     "michael&p=america&c=QtSubsonicPlayer&v=1."
                                     "5.0&id=2f686f6d652f6d69636861656c2f4d7573"
                                     "69632f4d50332f4a6f686e204d617965722f48656"
                                     "176696572205468696e67732f303120436c617269"
-                                    "74792e6d7033");*/
+                                    "74792e6d7033");
 
     mediaObject->setCurrentSource(mediaSource);
 

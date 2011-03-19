@@ -16,23 +16,29 @@ QT += phonon \
 # Input
 HEADERS += src/connecttoserverdialog.h \
     src/mainwindow.h \
-    src/xmlrequests/pingtest.h \
-    src/xmlrequests/retrieveindex.h \
-    src/xmlrequests/subrequestxml.h \
-    src/xmlrequests/retrievedirectory.h \
-    src/xmlrequests/xmlcachehandler.h \
-    src/mediaplayer.h
+    src/mediaplayer.h \
+    src/controller/xmlcachehandler.h \
+    src/dal/connectiondata.h \
+    src/dal/subrequest.h \
+    src/dal/xmlrequests/subrequestxml.h \
+    src/dal/xmlrequests/retrieveindex.h \
+    src/dal/xmlrequests/retrievedirectory.h \
+    src/dal/xmlrequests/pingtest.h \
+    src/dal/binrequests/subrequestbin.h
 FORMS += src/connecttoserverdialog.ui \
     src/mainwindow.ui
 SOURCES += src/connecttoserverdialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
-    src/xmlrequests/pingtest.cpp \
-    src/xmlrequests/retrieveindex.cpp \
-    src/xmlrequests/subrequestxml.cpp \
-    src/xmlrequests/retrievedirectory.cpp \
-    src/xmlrequests/xmlcachehandler.cpp \
-    src/mediaplayer.cpp
+    src/mediaplayer.cpp \
+    src/controller/xmlcachehandler.cpp \
+    src/dal/subrequest.cpp \
+    src/dal/connectiondata.cpp \
+    src/dal/xmlrequests/subrequestxml.cpp \
+    src/dal/xmlrequests/retrieveindex.cpp \
+    src/dal/xmlrequests/retrievedirectory.cpp \
+    src/dal/xmlrequests/pingtest.cpp \
+    src/dal/binrequests/subrequestbin.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \

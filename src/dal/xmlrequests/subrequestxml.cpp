@@ -3,6 +3,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtXml/QDomDocument>
 #include <QUrl>
+#include <stdio.h>
+
 #include "subrequestxml.h"
 
 /*

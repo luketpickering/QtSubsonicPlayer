@@ -1,20 +1,33 @@
 #include <QtGui>
+#include <QFile>
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomElement>
+#include <QtXml/QDomNode>
+#include <QtXml/QDomNodeList>
 #include <QString>
+#include <QStringList>
+#include <QStringListModel>
 
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "mediaplayer.h"
-#include "xmlrequests/xmlcachehandler.h"
-#include "xmlrequests/pingtest.h"
+#include "controller/xmlcachehandler.h"
+#include "dal/connectiondata.h"
 
 // constructor for MainWindow
 MainWindow::MainWindow()
 {
+    cd = new ConnectionData("hotblack.subsonic.org","49MR","49",-1);
+    xch = new XMLCacheHandler(cd,this);
+
     setupUi(this);
     mediaPlayer = new MediaPlayer(this);
 
     setMenuActions();
     setMediaActions();
+    setRequestConnections();
+
+    xch->requestArtistList();
 }
 
 
@@ -145,3 +158,172 @@ void MainWindow::setServerData(QString &_srvr,
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
+
+
+
+
+// ListView Population Methods and Slots **************************************
+
+/*
+  setRequestConnections is a public method that sets up the connections between
+  the ListView objects and the requests to the xmlcache for the xml elements
+  in order to set the list views.
+*/
+void MainWindow::setRequestConnections()
+{
+    connect(xch, SIGNAL(takeThisIndexOffMeItsCrampingMyStyle(QDomElement)),
+            this, SLOT(changeArtists(QDomElement)));
+
+    connect(artistListView, SIGNAL(clicked(QModelIndex)),
+            this, SLOT(requestAlbums(QModelIndex)));
+
+    connect(xch, SIGNAL(takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement)),
+            this, SLOT(changeAlbums(QDomElement)));
+
+    connect(albumTracksListView, SIGNAL(doubleClicked(QModelIndex)),
+            this, SLOT(requestTracks(QModelIndex)));
+
+    connect(xch, SIGNAL(takeThisAlbumWhileStocksLast(QDomElement)),
+            this, SLOT(changeTracks(QDomElement)));
+}
+
+
+/*
+  changeArtists(QDomElement) is a slot which takes a QDomElement argument uses
+  the xml to create a QStringList with all of the artist names and then uses
+  this to create a QStringModelList with which is represented by the
+  artistListView.
+*/
+void MainWindow::changeArtists(QDomElement artistsElement)
+{
+    QStringList *artistList = getValuesList(artistsElement, "artist", "name");
+
+    artistListModel = new QStringListModel(*artistList, this);
+    artistListView->setModel(artistListModel);
+}
+
+
+/*
+  requestAlbums is a slot which takes a QModelIndex argument from the
+  artistListView clicked(QModelIndex) slot and uses it to find the artist
+  name that was clicked from the artistListModel and then sends a request to
+  the xml cache for the artist's albums.
+*/
+void MainWindow::requestAlbums(QModelIndex _index)
+{
+    currentArtist = artistListModel->data(_index, 2).toString();
+
+
+    xch->requestArtistAlbums(currentArtist);
+}
+
+
+/*
+  changeAlbums(QDomElement) is a slot which takes a QDomElement arguement
+  from the xml cache's signal (which was requested by
+  requestAlbums(QModelIndex)) and uses that QDomElement get a QStringList of
+  albums for the artist and creates a QStringListModel from it. It sets
+  the QStringListModel as the albumTracksListView model.
+*/
+void MainWindow::changeAlbums(QDomElement artistElement)
+{
+    QStringList *albumList = getValuesList(artistElement, "album", "title");
+
+    albumListModel = new QStringListModel(*albumList, this);
+    albumTracksListView->setModel(albumListModel);
+}
+
+
+/*
+  requestTracks(QModelIndex) is a slot which takes a QModelIndex argument from
+  the albumTracksListView doubleclicked(QModelIndex) slot and uses it to find
+  the album title that was clicked from the albumListModel and then sends a
+  request to the xml cache for the album's tracks.
+*/
+void MainWindow::requestTracks(QModelIndex _index)
+{
+    QString album;
+    album = albumListModel->data(_index, 2).toString();
+
+    xch->requestAlbum(currentArtist,album);
+}
+
+
+/*
+  changeTracks(QDomElement) is a slot which takes a QDomElement arguement
+  from the xml cache's signal (which was requested by
+  requestTracks(QModelIndex)) and uses that QDomElement get a QStringList of
+  tracks for the album and creates a QStringListModel from it. It sets
+  the QStringListModel as the albumTracksListView model.
+*/
+void MainWindow::changeTracks(QDomElement albumElement)
+{
+    //std::cout << qPrintable(albumElement.tagName()) << std::endl;
+    QStringList *trackList = getValuesList(albumElement, "track", "title");
+
+    trackListModel = new QStringListModel(*trackList, this);
+    albumTracksListView->setModel(trackListModel);
+}
+
+
+/*
+  getValuesList(toomanyicantbebotheredtowritethemout) takes a QDomElement
+  and returns a list of attribute values for a given attribute (attributeName)
+  for all child elements with a tage name (tagName).
+*/
+QStringList *MainWindow::getValuesList(const QDomElement element,
+                                   const QString tagName,
+                                   const QString attributeName)
+{
+    QStringList *valuesList = new QStringList;
+
+    QDomNodeList nodeList = element.elementsByTagName(tagName);
+    QDomNode node;
+    QDomElement elem;class QDomElement;
+
+    for(unsigned int i = 0; i < nodeList.length(); ++i)
+    {
+        node = nodeList.at(i);
+        elem = node.toElement();
+        if (!elem.isNull())
+        {
+            valuesList->append(elem.attribute(attributeName));
+        }
+    }
+
+    return valuesList;
+}
+
+/*
+  getValue(evenmoresoimdefinitelynotlistingthem) takes a QDomElement and
+  returns the value for an attribute (returnAttributeName) for an element
+  with tag name (tagName) and an attribute (attributeName) with a
+  specified value (attributeValue).
+*/
+QString *MainWindow::getValue(QDomElement element,
+                          QString tagName,
+                          QString attributeName,
+                          QString attributeValue,
+                          QString returnAttributeName)
+{
+    QString *value = new QString;
+    QDomNodeList nodeList = element.elementsByTagName(tagName);
+    QDomNode node;
+    QDomElement elem;
+
+    for(unsigned int i = 0; i < nodeList.length(); ++i)
+    {
+        node = nodeList.at(i);
+        elem = node.toElement();
+        if (!elem.isNull())
+        {
+            if (elem.attribute(attributeName) == attributeValue)
+            {
+                *value = elem.attribute(returnAttributeName);
+                return value;
+            }
+        }
+    }
+
+    return 0;
+}

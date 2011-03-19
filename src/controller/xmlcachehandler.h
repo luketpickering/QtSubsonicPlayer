@@ -23,7 +23,7 @@ class XMLCacheHandler: public QObject
 public:
 	//----- Constructors
     XMLCacheHandler(ConnectionData* _cd, QObject* parent);
-	XMLCacheHandler::XMLCacheHandler(QObject* parent);
+    XMLCacheHandler(QObject* parent);
 	//----- Destructor
     ~XMLCacheHandler();
 
