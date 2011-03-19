@@ -88,14 +88,44 @@ void MainWindow::about()
 */
 void MainWindow::setMediaConnections()
 {
+    // set the SeekSlider to work with mediaPlayer's mediaObject
+    seekSlider->setMediaObject(mediaPlayer->mediaObject);
+
     // set up Play/Pause/Stop buttons
-    connect(playButton, SIGNAL(clicked()), mediaPlayer, SLOT(playClicked()));
-    connect(pauseButton, SIGNAL(clicked()), mediaPlayer, SLOT(pauseClicked()));
-    connect(stopButton, SIGNAL(clicked()), mediaPlayer, SLOT(stopClicked()));
+    connect(playPauseButton, SIGNAL(clicked(bool)),
+            this, SLOT(playPauseClicked(bool)));
+
+    connect(stopButton, SIGNAL(clicked()),
+            this, SLOT(stopButtonClicked()));
 
     // set up time labels
     connect(mediaPlayer, SIGNAL(tock(qint64)),
             this, SLOT(setTimeElapsedLabel(qint64)));
+}
+
+
+void MainWindow::playPauseClicked(bool play)
+{
+    if (!play)
+    {
+        playPauseButton->
+                setIcon(QIcon(":/mediaicons/media-playback-start.png"));
+        mediaPlayer->pauseClicked();
+    }
+    else
+    {
+        playPauseButton->
+                setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
+        mediaPlayer->playClicked();
+    }
+}
+
+void MainWindow::stopButtonClicked()
+{
+    mediaPlayer->stopClicked();
+
+    playPauseButton->setChecked(false);
+    playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-start.png"));
 }
 
 /*

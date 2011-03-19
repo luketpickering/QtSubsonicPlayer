@@ -59,6 +59,8 @@ public slots:
     void connectToServer();
     void setServerData(QString&, QString&, QString&);
 
+    void playPauseClicked(bool);
+    void stopButtonClicked();
     void setTimeElapsedLabel(qint64); 
 
     void requestArtists();
