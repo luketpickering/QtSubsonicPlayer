@@ -1,3 +1,1 @@
-Currently the code is an empty shell which does... nothing
-
-http://localhost:4040/rest/stream.view?u=michael&p=america&c=QtSubsonicPlayer&v=1.5.0&id=2f686f6d652f6d69636861656c2f4d757369632f4d50332f4a6f686e204d617965722f48656176696572205468696e67732f303120436c61726974792e6d7033
+Currently this code can query a subsonic server for albums and tracks ! (not play them (yet))
