@@ -1,8 +1,13 @@
 #include "xmlcachehandler.h"
 #include <QFile>
+#include <qbuffer.h>
 #include "../dal/xmlrequests/retrieveindex.h"
 #include "../dal/connectiondata.h"
 #include "../dal/xmlrequests/retrievedirectory.h"
+#include "../dal/binrequests/retrievetrackstream.h"
+#include <phonon/mediaobject.h>
+#include <phonon>
+#include <phonon/mediasource.h>
 
 /*
 	Constructors
@@ -73,6 +78,48 @@ void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
 	else
 		emit requireHardReset();
 }
+QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
+{
+	QDomElement artist = findArtist(_artistName);
+	QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
+	QDomElement track = getFirstChildByAttributeValue(album,"title",_trackName);
+	
+	if(!track.isNull())
+	{
+		QString id = track.attribute("id","null");
+		if(id.compare("null") != 0 )
+		{
+			RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
+			connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
+				,this, SLOT(TESTPLAYER(QBuffer*, qint64, qint64)));
+			rts->retrieve();
+		}
+	}
+
+	return QString();
+}
+
+void XMLCacheHandler::TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot)
+{
+	Phonon::MediaObject* player = Phonon::createPlayer(Phonon::MusicCategory,
+		*(new Phonon::MediaSource(_buf)));
+	connect(player, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this,
+		SLOT(TESTPHONON(Phonon::State,Phonon::State)));
+	player->play();
+}
+
+void XMLCacheHandler::TESTPHONON(Phonon::State _ns,Phonon::State _os)
+{
+	if(_ns == Phonon::ErrorState)
+	{
+		printf(((Phonon::MediaObject*)sender())->errorString().toLocal8Bit());
+	}
+}
+
+/*
+	Clean
+*/
+
 void XMLCacheHandler::hardResetCache()
 {
 	// check for conection data
@@ -108,7 +155,7 @@ void XMLCacheHandler::saveNewCache(QDomDocument* _responsexml)
     cacheFile = _responsexml;
 
 	saveCacheToDisk();
-
+	emit cacheReset();
 	emit cacheReady();
 }
 void XMLCacheHandler::returnArtistElement()
@@ -248,10 +295,8 @@ bool XMLCacheHandler::saveCacheToDisk()
 	{
 		QFile file("xmlcache.xml");
 		file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
-                file.remove();
 
 		//TODO -- this should use a text stream writer to save
-                file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
 		file.write(cacheFile->toString(3).toUtf8());
 		file.flush();
 		file.close();

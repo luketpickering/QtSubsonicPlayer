@@ -3,8 +3,6 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtXml/QDomDocument>
 #include <QUrl>
-#include <stdio.h>
-
 #include "subrequest.h"
 
 /*
@@ -41,7 +39,6 @@ void SubRequest::makeRequest()
     netReply = netAMan->get(netReq);
     connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
 	int bla = 2;
-        bla = 2;
 }
 
 /*Construct and return URL for server dependent on connection data
@@ -84,8 +81,7 @@ bool SubRequest::isHttpRedirect()
 on final response calls base class specificHandler*/
 void SubRequest::handleRawResponse()
 {
-
-    printf("Recieved response from: " + netReq.url().host()
+	printf("Recieved response from: " + netReq.url().host()
            .toLocal8Bit() + "\n");
 
     if(netReply->error() == QNetworkReply::NoError ) 

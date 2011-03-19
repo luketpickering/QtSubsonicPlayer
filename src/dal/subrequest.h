@@ -6,8 +6,6 @@
 #include <QtNetwork/QNetworkReply>
 #include <QObject>
 #include <QUrl>
-#include <QPair>
-#include <QList>
 #include "connectiondata.h"
 
 /*
@@ -31,7 +29,7 @@ private slots:
 
 protected:
 	//------Members
-        QList< QPair<QString, QString> > params;
+	QList< QPair<QString, QString> > params;
 	QString endpointLocation;
 
 	//Network members

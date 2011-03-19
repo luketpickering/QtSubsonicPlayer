@@ -2,8 +2,10 @@
 #define XMLCACHEHANDLER_H
 #include <QtXml/QDomDocument>
 #include <QObject>
+#include <qbuffer.h>
 #include "../dal/connectiondata.h"
 #include "../dal/xmlrequests/retrievedirectory.h"
+#include <phonon>
 
 /*
 	Class to handle the XML cache. A fresh cache will start
@@ -23,14 +25,17 @@ class XMLCacheHandler: public QObject
 public:
 	//----- Constructors
     XMLCacheHandler(ConnectionData* _cd, QObject* parent);
-    XMLCacheHandler(QObject* parent);
+	XMLCacheHandler::XMLCacheHandler(QObject* parent);
 	//----- Destructor
     ~XMLCacheHandler();
+
+	//TODO -- write ready to recieve
 
 	//----- Public request functions
 	void requestArtistList();
 	void requestArtistAlbums(QString _artistName);
 	void requestAlbum(QString _artistName, QString _albumName);
+	QString requestTrack(QString _artistName, QString _albumName, QString _trackName);
 
 	//----- Public clean
 	void hardResetCache();
@@ -46,6 +51,7 @@ signals:
 	void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
 	void noConnectionData();
 	void requireHardReset();
+	void cacheReset();
 
 	/*
 		Internal comms
@@ -59,6 +65,9 @@ private slots:
 	void recievedArtistsDir(QDomDocument*);
 	void recievedAlbum(QDomDocument*);
 	void returnArtistElement();
+
+	void TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot);
+	void TESTPHONON(Phonon::State _ns,Phonon::State _os);
 
 private:
 	//----- Members
