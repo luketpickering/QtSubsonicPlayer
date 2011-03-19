@@ -190,9 +190,6 @@ void MainWindow::setRequestConnections()
 
     connect(xch, SIGNAL(takeThisAlbumWhileStocksLast(QDomElement)),
             this, SLOT(changeTracks(QDomElement)));
-
-    connect(refreshArtistButton, SIGNAL(clicked()),
-            this, SLOT(requestArtists()));
 }
 
 void MainWindow::requestArtists()
