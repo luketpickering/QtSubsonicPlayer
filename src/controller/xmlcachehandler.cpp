@@ -1,5 +1,7 @@
 #include "xmlcachehandler.h"
 #include <QFile>
+#include <QStringList>
+#include <QString>
 #include "../dal/xmlrequests/retrieveindex.h"
 #include "../dal/connectiondata.h"
 #include "../dal/xmlrequests/retrievedirectory.h"
@@ -347,4 +349,70 @@ XMLCacheHandler::~XMLCacheHandler(){
 		delete cacheFile;
 	}
 
+}
+
+
+
+// moved from mainwindow.cpp by mjn
+/*
+  getValuesList(toomanyicantbebotheredtowritethemout) takes a QDomElement
+  and returns a list of attribute values for a given attribute (attributeName)
+  for all child elements with a tage name (tagName).
+*/
+QStringList *XMLCacheHandler::getValuesList(const QDomElement element,
+                                            const QString tagName,
+                                            const QString attributeName)
+{
+    QStringList *valuesList = new QStringList;
+
+    QDomNodeList nodeList = element.elementsByTagName(tagName);
+    QDomNode node;
+    QDomElement elem;class QDomElement;
+
+    for(unsigned int i = 0; i < nodeList.length(); ++i)
+    {
+        node = nodeList.at(i);
+        elem = node.toElement();
+        if (!elem.isNull())
+        {
+            valuesList->append(elem.attribute(attributeName));
+        }
+    }
+
+    return valuesList;
+}
+
+// moved from mainwindow.cpp by mjn
+/*
+  getValue(evenmoresoimdefinitelynotlistingthem) takes a QDomElement and
+  returns the value for an attribute (returnAttributeName) for an element
+  with tag name (tagName) and an attribute (attributeName) with a
+  specified value (attributeValue).
+*/
+QString *XMLCacheHandler::getValue(QDomElement element,
+                                   QString tagName,
+                                   QString attributeName,
+                                   QString attributeValue,
+                                   QString returnAttributeName)
+{
+    QString *value = new QString;
+    QDomNodeList nodeList = element.elementsByTagName(tagName);
+    QDomNode node;
+    QDomElement elem;
+
+    for(unsigned int i = 0; i < nodeList.length(); ++i)
+    {
+        node = nodeList.at(i);
+        elem = node.toElement();
+        if (!elem.isNull())
+        {
+            if (elem.attribute(attributeName) == attributeValue)
+            {
+                *value = elem.attribute(returnAttributeName);
+                return value;
+            }
+        }
+    }
+
+    return 0;
 }

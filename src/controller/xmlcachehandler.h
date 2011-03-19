@@ -32,6 +32,17 @@ public:
 	void requestArtistAlbums(QString _artistName);
 	void requestAlbum(QString _artistName, QString _albumName);
 
+        // XML Handling Functions (moved here by Michael)
+        QStringList *getValuesList(const QDomElement element,
+                                   const QString tagName,
+                                   const QString attributeName);
+
+        QString *getValue(const QDomElement element,
+                          const QString tagName,
+                          const QString attributeName,
+                          const QString attributeValue,
+                          const QString returnAttributeName);
+
 	//----- Public clean
 	void hardResetCache();
 

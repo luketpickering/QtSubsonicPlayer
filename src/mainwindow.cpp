@@ -9,6 +9,8 @@
 #include <QStringListModel>
 #include <QThread>
 
+#include <iostream>
+
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "mediaplayer.h"
@@ -25,8 +27,8 @@ MainWindow::MainWindow()
     setupUi(this);
     mediaPlayer = new MediaPlayer(this);
 
-    setMenuActions();
-    setMediaActions();
+    setMenuConnections();
+    setMediaConnections();
     setRequestConnections();
 
     xch->requestArtistList();
@@ -40,7 +42,7 @@ MainWindow::MainWindow()
   setMenuActions() is a function which sets up the menu actions for the main
   menubar of MainWindow.
 */
-void MainWindow::setMenuActions()
+void MainWindow::setMenuConnections()
 {
     // set up "About Qt" action
     connect(actionAboutQt, SIGNAL(triggered()),
@@ -78,15 +80,13 @@ void MainWindow::about()
 
 
 
-
-
-// Media Related Methods and Slots ********************************************
+// MediaPlayer Related Methods and Slots **************************************
 
 /*
   setMediaActions() is a function that sets up the Media buttons and scroll
   bar and connects them with the mediaObject.
 */
-void MainWindow::setMediaActions()
+void MainWindow::setMediaConnections()
 {
     // set up Play/Pause/Stop buttons
     connect(playButton, SIGNAL(clicked()), mediaPlayer, SLOT(playClicked()));
@@ -120,8 +120,6 @@ void MainWindow::setTimeElapsedLabel(qint64 _time)
 }
 
 // END: Media Related Methods and Slots ***************************************
-
-
 
 
 
@@ -205,7 +203,8 @@ void MainWindow::requestArtists()
 */
 void MainWindow::changeArtists(QDomElement artistsElement)
 {
-    QStringList *artistList = getValuesList(artistsElement, "artist", "name");
+    QStringList *artistList = xch->getValuesList(artistsElement,
+                                                 "artist", "name");
 
     artistListModel = new QStringListModel(*artistList, this);
     artistListView->setModel(artistListModel);
@@ -220,8 +219,14 @@ void MainWindow::changeArtists(QDomElement artistsElement)
 */
 void MainWindow::requestAlbums(QModelIndex _index)
 {
+    // these two lines blank the ListView while it is updated
+    albumListModel = new QStringListModel(QStringList("Loading..."), this);
+    albumTracksListView->setModel(albumListModel);
+
     listViewCurrentArtist = artistListModel->data(_index, 2).toString();
     xch->requestArtistAlbums(listViewCurrentArtist);
+
+    showingTracks = false;
 }
 
 
@@ -234,10 +239,13 @@ void MainWindow::requestAlbums(QModelIndex _index)
 */
 void MainWindow::changeAlbums(QDomElement artistElement)
 {
-    QStringList *albumList = getValuesList(artistElement, "album", "title");
+    QStringList *albumList = xch->getValuesList(artistElement,
+                                                "album",
+                                                "title");
 
     albumListModel = new QStringListModel(*albumList, this);
     albumTracksListView->setModel(albumListModel);
+    showingTracks = false;
 }
 
 
@@ -249,10 +257,26 @@ void MainWindow::changeAlbums(QDomElement artistElement)
 */
 void MainWindow::requestTracks(QModelIndex _index)
 {
-    QString album;
-    album = albumListModel->data(_index, 2).toString();
 
-    xch->requestAlbum(listViewCurrentArtist,album);
+
+    if (!showingTracks)
+    {
+        QString album;
+        album = albumListModel->data(_index, 2).toString();
+        // these two lines blank the ListView while it is updated
+        trackListModel = new QStringListModel(QStringList("Loading..."), this);
+        albumTracksListView->setModel(trackListModel);
+
+        xch->requestAlbum(listViewCurrentArtist,album);
+    }
+    else
+    {
+        QString track;
+        track = trackListModel->data(_index, 2).toString();
+
+        // replace this line by function call to get stream
+        std::cout << "requesting track " << qPrintable(track) << std::endl;
+    }
 }
 
 
@@ -266,71 +290,12 @@ void MainWindow::requestTracks(QModelIndex _index)
 void MainWindow::changeTracks(QDomElement albumElement)
 {
     //std::cout << qPrintable(albumElement.tagName()) << std::endl;
-    QStringList *trackList = getValuesList(albumElement, "track", "title");
+    QStringList *trackList = xch->getValuesList(albumElement,
+                                                "track",
+                                                "title");
 
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
+    showingTracks = true;
 }
 
-
-/*
-  getValuesList(toomanyicantbebotheredtowritethemout) takes a QDomElement
-  and returns a list of attribute values for a given attribute (attributeName)
-  for all child elements with a tage name (tagName).
-*/
-QStringList *MainWindow::getValuesList(const QDomElement element,
-                                   const QString tagName,
-                                   const QString attributeName)
-{
-    QStringList *valuesList = new QStringList;
-
-    QDomNodeList nodeList = element.elementsByTagName(tagName);
-    QDomNode node;
-    QDomElement elem;class QDomElement;
-
-    for(unsigned int i = 0; i < nodeList.length(); ++i)
-    {
-        node = nodeList.at(i);
-        elem = node.toElement();
-        if (!elem.isNull())
-        {
-            valuesList->append(elem.attribute(attributeName));
-        }
-    }
-
-    return valuesList;
-}
-
-/*
-  getValue(evenmoresoimdefinitelynotlistingthem) takes a QDomElement and
-  returns the value for an attribute (returnAttributeName) for an element
-  with tag name (tagName) and an attribute (attributeName) with a
-  specified value (attributeValue).
-*/
-QString *MainWindow::getValue(QDomElement element,
-                          QString tagName,
-                          QString attributeName,
-                          QString attributeValue,
-                          QString returnAttributeName)
-{
-    QString *value = new QString;
-    QDomNodeList nodeList = element.elementsByTagName(tagName);
-    QDomNode node;
-    QDomElement elem;
-
-    for(unsigned int i = 0; i < nodeList.length(); ++i)
-    {
-        node = nodeList.at(i);
-        elem = node.toElement();
-        if (!elem.isNull())
-        {
-            if (elem.attribute(attributeName) == attributeValue)
-            {
-                *value = elem.attribute(returnAttributeName);
-                return value;
-            }
-        }
-    }
-
-    return 0;
-}

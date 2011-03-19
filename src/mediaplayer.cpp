@@ -21,7 +21,6 @@ MediaPlayer::MediaPlayer(QObject *parent) :
     Phonon::MediaSource mediaSource("http://mnielsen.org.uk/~michael/gravity.mp3");
 
     mediaObject->setCurrentSource(mediaSource);
-
     connect(mediaObject, SIGNAL(tick(qint64)), this, SIGNAL(tock(qint64)));
 }
 

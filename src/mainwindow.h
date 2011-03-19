@@ -24,53 +24,41 @@ class MainWindow
     Q_OBJECT
 
 public:
+    // Members
     XMLCacheHandler *xch;
     ConnectionData *cd;
     PingTest *pingtest;
-    QString listViewCurrentArtist;
 
+    bool showingTracks;
+    QString listViewCurrentArtist;
     QStringListModel *artistListModel;
     QStringListModel *albumListModel;
     QStringListModel *trackListModel;
 
-    // Members
     QString serverpath;
     QString username;
     QString password;
 
     MediaPlayer *mediaPlayer;
 
-    QBuffer *currentTrackBuffer;
-
     // Methods
     MainWindow();
-
-    void setRequestConnections();
-
-    QStringList *getValuesList(const QDomElement element,
-                               const QString tagName,
-                               const QString attributeName);
-
-    QString *getValue(const QDomElement element,
-                      const QString tagName,
-                      const QString attributeName,
-                      const QString attributeValue,
-                      const QString returnAttributeName);
-
 
 signals:
     void mediaPlay();
     void mediaPause();
 
 private:
-    void setMenuActions();
-    void setPhonon();
-    void setMediaActions();
+    void setMenuConnections();
+    void setMediaConnections();
+    void setRequestConnections();
 
 public slots:
-    void connectToServer();
     void about();
+
+    void connectToServer();
     void setServerData(QString&, QString&, QString&);
+
     void setTimeElapsedLabel(qint64); 
 
     void requestArtists();
