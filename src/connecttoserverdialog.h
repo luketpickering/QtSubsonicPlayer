@@ -21,7 +21,7 @@ private slots:
     void serverData();
 
 signals:
-    void serverDataSet(QString &Server, QString &Username, QString &Password);
+    void serverDetailsEntered(QString &Server, QString &Username, QString &Password);
 };
 
 #endif // CONNECTTOSERVERDIALOG_H

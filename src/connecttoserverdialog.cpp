@@ -20,5 +20,5 @@ void ConnectToServerDialog::serverData()
     username = usernameLineEdit->text();
     password = passwordLineEdit->text();
 
-    emit serverDataSet(serverpath, username, password);
+    emit serverDetailsEntered(serverpath, username, password);
 }

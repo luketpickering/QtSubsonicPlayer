@@ -9,6 +9,7 @@
 
 class XMLCacheHandler;
 class ConnectionData;
+class PingTest;
 class QDomDocument;
 class QString;
 class QStringListModel;
@@ -25,7 +26,8 @@ class MainWindow
 public:
     XMLCacheHandler *xch;
     ConnectionData *cd;
-    QString currentArtist;
+    PingTest *pingtest;
+    QString listViewCurrentArtist;
 
     QStringListModel *artistListModel;
     QStringListModel *albumListModel;
@@ -60,7 +62,6 @@ signals:
     void mediaPlay();
     void mediaPause();
 
-
 private:
     void setMenuActions();
     void setPhonon();
@@ -72,6 +73,7 @@ public slots:
     void setServerData(QString&, QString&, QString&);
     void setTimeElapsedLabel(qint64); 
 
+    void requestArtists();
     void changeArtists(QDomElement);
     void requestAlbums(QModelIndex);
     void changeAlbums(QDomElement);

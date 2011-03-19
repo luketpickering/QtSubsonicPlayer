@@ -49,7 +49,6 @@ OTHER_FILES += resources/media-skip-forward.png \
     resources/media-playback-start.png \
     resources/media-playback-pause.png \
     resources/subsonic-icon.png \
-    README.txt \
     README
 
 # Output

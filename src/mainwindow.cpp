@@ -7,12 +7,14 @@
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
+#include <QThread>
 
 #include "mainwindow.h"
 #include "connecttoserverdialog.h"
 #include "mediaplayer.h"
 #include "controller/xmlcachehandler.h"
 #include "dal/connectiondata.h"
+#include "dal/xmlrequests/pingtest.h"
 
 // constructor for MainWindow
 MainWindow::MainWindow()
@@ -136,8 +138,11 @@ void MainWindow::connectToServer()
 
     // connect the signal from connectToServerDialog to the setServerData slot
     connect(connectToServerDialog,
-            SIGNAL(serverDataSet(QString&, QString&, QString&)),
+            SIGNAL(serverDetailsEntered(QString&, QString&, QString&)),
             this, SLOT(setServerData(QString&,QString&,QString&)));
+
+    QMessageBox::warning(this, tr("ERROR ERROR ERROR!"),
+                         tr("<p>This does nothing yet!!!!!!!1!!!one!!!</p>"));
 
     connectToServerDialog->exec();
 }
@@ -185,8 +190,15 @@ void MainWindow::setRequestConnections()
 
     connect(xch, SIGNAL(takeThisAlbumWhileStocksLast(QDomElement)),
             this, SLOT(changeTracks(QDomElement)));
+
+    connect(refreshArtistButton, SIGNAL(clicked()),
+            this, SLOT(requestArtists()));
 }
 
+void MainWindow::requestArtists()
+{
+    xch->requestArtistList();
+}
 
 /*
   changeArtists(QDomElement) is a slot which takes a QDomElement argument uses
@@ -211,10 +223,8 @@ void MainWindow::changeArtists(QDomElement artistsElement)
 */
 void MainWindow::requestAlbums(QModelIndex _index)
 {
-    currentArtist = artistListModel->data(_index, 2).toString();
-
-
-    xch->requestArtistAlbums(currentArtist);
+    listViewCurrentArtist = artistListModel->data(_index, 2).toString();
+    xch->requestArtistAlbums(listViewCurrentArtist);
 }
 
 
@@ -245,7 +255,7 @@ void MainWindow::requestTracks(QModelIndex _index)
     QString album;
     album = albumListModel->data(_index, 2).toString();
 
-    xch->requestAlbum(currentArtist,album);
+    xch->requestAlbum(listViewCurrentArtist,album);
 }
 
 

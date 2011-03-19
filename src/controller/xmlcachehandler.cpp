@@ -248,8 +248,10 @@ bool XMLCacheHandler::saveCacheToDisk()
 	{
 		QFile file("xmlcache.xml");
 		file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+                file.remove();
 
 		//TODO -- this should use a text stream writer to save
+                file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
 		file.write(cacheFile->toString(3).toUtf8());
 		file.flush();
 		file.close();

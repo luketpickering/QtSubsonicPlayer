@@ -41,6 +41,7 @@ void SubRequest::makeRequest()
     netReply = netAMan->get(netReq);
     connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
 	int bla = 2;
+        bla = 2;
 }
 
 /*Construct and return URL for server dependent on connection data
