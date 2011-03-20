@@ -139,7 +139,11 @@ void SubRequest::handleRawResponse()
 		{
 			disconnect(netReply,SIGNAL(readyRead()), this, SLOT(handleRawResponse()));
 			connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
-			specificHandler();
+
+			if(netReply->isFinished())
+			{
+				specificHandler();
+			}
 		}
 		
     }

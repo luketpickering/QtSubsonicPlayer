@@ -38,7 +38,7 @@ public:
     void requestArtistList();
     void requestArtistAlbums(QString _artistName);
     void requestAlbum(QString _artistName, QString _albumName);
-    void requestTrack(QString _artistName, QString _albumName, QString _trackName);
+    QString requestTrack(QString _artistName, QString _albumName, QString _trackName);
 
     // XML Handling Functions (moved here by mjn)
     QStringList *getValuesList(const QDomElement element,
@@ -60,7 +60,7 @@ signals:
     void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
     void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
     void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
-    void takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64);
+	void takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64);
     void noConnectionData();
     void requireHardReset();
     void cacheReset();
@@ -76,12 +76,14 @@ private slots:
     void recievedAlbum(QDomDocument*);
     void returnArtistElement();
 
-    void streamFinished();
+    void streamFinished(qint64);
 
 private:
     //----- Members
     //cache in memory
     QDomDocument* cacheFile;
+
+	bool processingRequest;
 
     //connection data
     bool gotConnData;
