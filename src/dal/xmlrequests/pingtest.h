@@ -2,9 +2,8 @@
 #define PINGTEST_H
 
 #include <QObject>
-
-#include "src/dal/xmlrequests/subrequestxml.h"
-#include "src/dal/connectiondata.h"
+#include "subrequestxml.h"
+#include "../connectiondata.h"
 
 // Forward Class Definitions
 class QDomDocument;

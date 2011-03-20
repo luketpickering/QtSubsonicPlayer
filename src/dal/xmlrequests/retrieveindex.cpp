@@ -1,5 +1,9 @@
-#include "dal/xmlrequests/retrieveindex.h"
-#include "dal/xmlrequests/subrequestxml.h"
+#include "retrieveindex.h"
+#include "subrequestxml.h"
+#include <QObject>
+#include <QString>
+#include <QPair>
+#include "../connectiondata.h"
 
 // Constructor
 RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent) 

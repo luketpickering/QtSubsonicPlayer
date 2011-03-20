@@ -3,11 +3,11 @@
 
 #include <QObject>
 #include <QtXml/qdom.h>
-#include <phonon>
+#include <Phonon>
 #include <QBuffer>
 
-#include "src/dal/connectiondata.h"
-#include "src/dal/xmlrequests/retrievedirectory.h"
+#include "../dal/connectiondata.h"
+#include "../dal/xmlrequests/retrievedirectory.h"
 
 /*
   Class to handle the XML cache. A fresh cache will start

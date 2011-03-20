@@ -5,7 +5,7 @@
 #include <QUrl>
 #include <iostream>
 
-#include "dal/subrequest.h"
+#include "subrequest.h"
 
 // Protected Constructor
 SubRequest::SubRequest(ConnectionData* _conndata,QObject* parent )

@@ -8,11 +8,11 @@
 #include <iostream>
 #include <QtXml/qdom.h>
 
-#include "controller/xmlcachehandler.h"
-#include "dal/xmlrequests/retrieveindex.h"
-#include "dal/connectiondata.h"
-#include "dal/xmlrequests/retrievedirectory.h"
-#include "dal/binrequests/retrievetrackstream.h"
+#include "xmlcachehandler.h"
+#include "../dal/xmlrequests/retrieveindex.h"
+#include "../dal/connectiondata.h"
+#include "../dal/xmlrequests/retrievedirectory.h"
+#include "../dal/binrequests/retrievetrackstream.h"
 
 
 // BEGIN: Constructors ********************************************************

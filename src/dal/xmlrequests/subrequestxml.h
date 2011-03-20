@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "src/dal/connectiondata.h"
-#include "src/dal/subrequest.h"
+#include "../connectiondata.h"
+#include "../subrequest.h"
 
 // Forward Class Definitions
 class QDomDocument;

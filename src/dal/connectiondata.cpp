@@ -1,5 +1,5 @@
 #include <QString>
-#include "dal/connectiondata.h"
+#include "connectiondata.h"
 
 // BEGIN: Constructors ********************************************************
 

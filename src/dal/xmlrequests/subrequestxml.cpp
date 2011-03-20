@@ -55,11 +55,11 @@ void SubRequestXML::specificHandler()
 int SubRequestXML::isHealthySubResp()
 {
     respXML = new QDomDocument("ResponseDoc");
-    QString* errmsg = new QString(100, '0');
+    QString errmsg(100, '0');
     int errln, errcol;
 
 	//try and parse the response into an XML document
-    if(respXML->setContent(netReply->readAll(),false,errmsg,&errln,&errcol)) 
+    if(respXML->setContent(netReply->readAll(),false,&errmsg,&errln,&errcol)) 
 	{
 		//get the root element
         QDomElement responseNode = respXML->namedItem("subsonic-response")

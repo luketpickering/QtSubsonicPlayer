@@ -4,13 +4,12 @@
 #include <QtNetwork/QNetworkReply>
 #include <QObject>
 #include <QVariant>
-
-#include "dal/binrequests/subrequestbin.h"
-#include "dal/subrequest.h"
-
+#include "subrequestbin.h"
+#include "../subrequest.h"
 
 
-SubRequestBin::SubRequestBin(ConnectionData* _conndata,QObject* parent ) 
+
+SubRequestBin::SubRequestBin(ConnectionData* _conndata, QObject* parent ) 
     : SubRequest(_conndata,parent)
 {
 }

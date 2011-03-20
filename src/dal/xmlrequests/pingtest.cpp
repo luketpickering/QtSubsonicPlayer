@@ -1,6 +1,6 @@
 #include <QtXml/qdom.h>
 
-#include "dal/xmlrequests/pingtest.h"
+#include "pingtest.h"
 
 // Constructor
 PingTest::PingTest(ConnectionData* _conndata, QObject* parent)

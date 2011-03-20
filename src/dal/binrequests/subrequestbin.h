@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "src/dal/connectiondata.h"
-#include "src/dal/subrequest.h"
+#include "../connectiondata.h"
+#include "../subrequest.h"
 
 // Forwards Class Definitions
 class QBuffer;
@@ -31,7 +31,6 @@ protected:
 	SubRequestBin(ConnectionData* _cd, QObject* parent);
 
 	void specificHandler();
-	void virtual specificBinHandler(QBuffer* _buf) = 0;
 
 private:
 	//------Members

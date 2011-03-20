@@ -1,6 +1,6 @@
 #include <QtXml/QDomDocument>
 
-#include "dal/xmlrequests/retrievedirectory.h"
+#include "retrievedirectory.h"
 
 // Constructor
 RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent) 
