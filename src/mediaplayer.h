@@ -4,6 +4,7 @@
 #include <QObject>
 #include <Phonon/MediaObject>
 #include <Phonon/AudioOutput>
+#include <phonon/MediaSource>
 
 class QBuffer;
 
@@ -20,6 +21,9 @@ public:
 
 signals:
     void tock(qint64);
+    void stateChanged(Phonon::State _newState,
+                      Phonon::State _oldState);
+    void totalTimeChanged(qint64);
 
 public slots:
     void playClicked();

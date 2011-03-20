@@ -105,8 +105,31 @@ void MainWindow::setMediaConnections()
     // connect
     connect(xch, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)),
             mediaPlayer, SLOT(gotTrack(QBuffer*, qint64, qint64)));
+
+
+    connect(mediaPlayer, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+            this, SLOT(mediaPlayerChange(Phonon::State)));
+
+    connect(mediaPlayer, SIGNAL(totalTimeChanged(qint64)),
+            seekSlider, SLOT(update()));
 }
 
+void MainWindow::mediaPlayerChange(Phonon::State _newState)
+{
+    if (_newState == Phonon::PlayingState)
+    {
+        playPauseButton->
+                setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
+        playPauseButton->setChecked(true);
+    }
+    else if (_newState == Phonon::PausedState
+        || _newState == Phonon::StoppedState)
+    {
+        playPauseButton->
+                setIcon(QIcon(":/mediaicons/media-playback-start.png"));
+        playPauseButton->setChecked(false);
+    }
+}
 
 void MainWindow::playPauseClicked(bool play)
 {

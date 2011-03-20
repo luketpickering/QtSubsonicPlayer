@@ -19,9 +19,14 @@ MediaPlayer::MediaPlayer(QObject *parent) :
     tickInterval = 1000;
     mediaObject->setTickInterval(tickInterval);
     connect(mediaObject, SIGNAL(tick(qint64)), this, SIGNAL(tock(qint64)));
+    connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+            this, SIGNAL(stateChanged(Phonon::State,Phonon::State)));
+    connect(mediaObject, SIGNAL(totalTimeChanged(qint64)),
+            this, SIGNAL(totalTimeChanged(qint64)));
 }
 
-void MediaPlayer::gotTrack(QBuffer* buffer, qint64 currentSize, qint64 totalSize)
+void MediaPlayer::gotTrack(QBuffer* buffer,
+                           qint64 /*currentSize*/, qint64 /*totalSize*/)
 {
     Phonon::MediaSource mediaSource(buffer);
     mediaObject->setCurrentSource(mediaSource);

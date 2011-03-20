@@ -58,19 +58,19 @@ int SubRequestXML::isHealthySubResp()
     QString errmsg(100, '0');
     int errln, errcol;
 
-	//try and parse the response into an XML document
+    //try and parse the response into an XML document
     if(respXML->setContent(netReply->readAll(),false,&errmsg,&errln,&errcol)) 
-	{
-		//get the root element
+    {
+        //get the root element
         QDomElement responseNode = respXML->namedItem("subsonic-response")
                                    .toElement();
-		//if the element is not null
+        //if the element is not null
         if(!responseNode.isNull()) 
-		{
-			//check the response status, if failed or null try and parse the 
-			//response error code, if its ok return ok.
+        {
+            //check the response status, if failed or null try and parse the
+            //response error code, if its ok return ok.
             if(responseNode.attribute("status","failed").toLocal8Bit() == "failed") 
-			{
+            {
                 bool parsedEC;
                 int eC = 0;
 
@@ -86,11 +86,3 @@ int SubRequestXML::isHealthySubResp()
     }
     return -2;
 }
-
-
-
-
-
-
-
-
