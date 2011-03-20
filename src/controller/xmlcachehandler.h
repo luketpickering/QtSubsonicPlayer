@@ -60,6 +60,7 @@ signals:
     void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
     void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
     void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
+	void takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64);
     void noConnectionData();
     void requireHardReset();
     void cacheReset();
@@ -75,8 +76,7 @@ private slots:
     void recievedAlbum(QDomDocument*);
     void returnArtistElement();
 
-    void TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot);
-    void TESTPHONON(Phonon::State _ns,Phonon::State _os);
+    void streamFinished(qint64);
 
 private:
     //----- Members

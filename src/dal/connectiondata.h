@@ -11,16 +11,17 @@ class QString;
 class ConnectionData
 {
 public:
-	QString host;
-	QString usr;
-	QString pss;
-	int port;
-
 	ConnectionData();
 	ConnectionData(QString host,
                        QString usr,
                        QString pss,
                        int port);
+	QString host;
+	QString usr;
+	QString pss;
+	bool gotServerIP;
+	int port;
+
 };
 
 #endif

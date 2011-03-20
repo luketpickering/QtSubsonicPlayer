@@ -6,6 +6,7 @@
 ConnectionData::ConnectionData()
 {
     port = -1;
+	gotServerIP = false;
 }
 
 
@@ -16,6 +17,7 @@ ConnectionData::ConnectionData(QString _host, QString _usr,
     usr = _usr;
     pss = _pss;
     port = _port;
+	gotServerIP = false;
 }
 
 // END: Constructors **********************************************************

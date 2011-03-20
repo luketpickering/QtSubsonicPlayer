@@ -7,6 +7,9 @@
 
 #include "subrequest.h"
 
+using std::cout;
+using std::endl;
+
 // Protected Constructor
 SubRequest::SubRequest(ConnectionData* _conndata,QObject* parent )
     : QObject(parent)
@@ -14,9 +17,6 @@ SubRequest::SubRequest(ConnectionData* _conndata,QObject* parent )
     connData = _conndata;
     netAMan = new QNetworkAccessManager(this);
 }
-
-
-
 
 // BEGIN: Protected Methods ***************************************************
 
@@ -34,16 +34,22 @@ void SubRequest::makeRequest()
     netReq.setUrl(getUrl());
 
     //DEBUGGING start -----
-    puts(netReq.url().toString().toLocal8Bit());
+    cout << qPrintable(netReq.url().toString()) << endl;
     //DEBUGGING end -----
 
     //initate request and connect to private slot to handle response
     netReply = netAMan->get(netReq);
-    connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
-    int bla = 2;
 
-    // again to shush the compiler warnings
-    bla = 2;
+	//need to find the server first. Redirect has no body so doesn;t fire ready read
+
+	if(!connData->gotServerIP)
+	{
+		connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
+	}
+	else
+	{
+		connect(netReply,SIGNAL(readyRead()), this, SLOT(handleRawResponse()));
+	}
 }
 
 /*
@@ -63,23 +69,6 @@ QUrl SubRequest::getUrl()
     return rtnQUrl_;
 }
 
-/*
-  Checks if network response code is 302
-*/
-//TODO -- get rid of this useless function
-bool SubRequest::isHttpRedirect()
-{
-    int httpRC;
-
-    //get the response code
-    httpRC = netReply->attribute(QNetworkRequest::HttpStatusCodeAttribute)
-             .toInt();
-    //if it s a redirect
-    if(httpRC == 302) {
-        return true;
-    }
-    return false;
-}
 
 // END: Protected Methods *****************************************************
 
@@ -94,13 +83,18 @@ bool SubRequest::isHttpRedirect()
 */
 void SubRequest::handleRawResponse()
 {
-    std::cout << "Recieved response from: " << qPrintable(netReq.url().host())
-            << std::endl;
+    cout << "Recieved response from: " << qPrintable(netReq.url().host())
+            << endl;
 
     if(netReply->error() == QNetworkReply::NoError ) 
     {
 
-        if(isHttpRedirect()) 
+		//get the response code
+		int httpRC = netReply->attribute(QNetworkRequest::HttpStatusCodeAttribute)
+				 .toInt();
+
+		//if it s a redirect
+        if(!connData->gotServerIP && httpRC == 302)  
         {
             //close the current connection
             netReply->close();
@@ -129,15 +123,29 @@ void SubRequest::handleRawResponse()
             //send off request to server
             netReply = netAMan->get(netReq);
             connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
+			return;
         }
-        else
+		else if(!connData->gotServerIP && httpRC == 200)
         {
-            specificHandler();
+			connData->gotServerIP = true;
         }
+
+		if(netReply->header(QNetworkRequest::ContentTypeHeader).toString().compare("audio/mpeg") == 0)
+		{
+			disconnect(netReply,SIGNAL(readyRead()), this, SLOT(handleRawResponse()));
+			specificHandler();
+		}
+		else
+		{
+			disconnect(netReply,SIGNAL(readyRead()), this, SLOT(handleRawResponse()));
+			connect(netReply,SIGNAL(finished()), this, SLOT(handleRawResponse()));
+			specificHandler();
+		}
+		
     }
     else {
-        std::cout << "Network Error - "
-                << qPrintable(netReply->errorString()) << std::endl;
+        cout << "Network Error - "
+                << qPrintable(netReply->errorString()) << endl;
     }
 }
 

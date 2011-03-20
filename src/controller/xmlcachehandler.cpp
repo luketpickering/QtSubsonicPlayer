@@ -105,10 +105,12 @@ QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, Q
         {
             // commented out to make it compile!
 
-            // RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
-            // connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
-            //	,this, SLOT(TESTPLAYER(QBuffer*, qint64, qint64)));
-            // rts->retrieve();
+             RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
+             connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
+            	,this, SLOT(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
+			 connect(rts, SIGNAL(finishedDownloading(qint64))
+            	,this, SLOT(streamFinished(qint64)));
+             rts->retrieve();
         }
     }
 
@@ -116,36 +118,6 @@ QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, Q
 }
 
 // ----- END: Requests
-
-
-void XMLCacheHandler::TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot)
-{
-    Phonon::MediaObject* player = Phonon::createPlayer(Phonon::MusicCategory,
-                                                       *(new Phonon::MediaSource(_buf)));
-    connect(player, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this,
-            SLOT(TESTPHONON(Phonon::State,Phonon::State)));
-    player->play();
-
-    // these are just to remove the compiler warnings about unused parameters
-    qint64 nuisanceRemover1 = _cur;
-    nuisanceRemover1 = _tot;
-}
-
-
-void XMLCacheHandler::TESTPHONON(Phonon::State _ns,Phonon::State _os)
-{
-    if(_ns == Phonon::ErrorState)
-    {
-        std::cout << qPrintable(((Phonon::MediaObject*)sender())
-                                ->errorString())
-                << std::endl;
-    }
-
-    // Just to remove compiler unused parameter warnings
-    Phonon::State nuisanceRemover2;
-    nuisanceRemover2 = _os;
-}
-
 
 /*
   Clean
@@ -262,6 +234,11 @@ void XMLCacheHandler::recievedAlbum(QDomDocument* _respXML)
     }
 
     emit takeThisAlbumWhileStocksLast(album);
+}
+
+void XMLCacheHandler::streamFinished(qint64)
+{
+	((QObject*)sender())->deleteLater();
 }
 
 // END: Private Slots *********************************************************
