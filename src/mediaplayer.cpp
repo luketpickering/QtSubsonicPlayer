@@ -18,17 +18,12 @@ MediaPlayer::MediaPlayer(QObject *parent) :
     // set the tickinterval to 1000ms
     tickInterval = 1000;
     mediaObject->setTickInterval(tickInterval);
-
-    // set the MediaSource (single file on my (michael) server for now)
-    Phonon::MediaSource mediaSource("http://mnielsen.org.uk/~michael/gravity.mp3");
-
-    mediaObject->setCurrentSource(mediaSource);
     connect(mediaObject, SIGNAL(tick(qint64)), this, SIGNAL(tock(qint64)));
 }
 
-void MediaPlayer::gotTrack(QBuffer buffer)
+void MediaPlayer::gotTrack(QBuffer* buffer, qint64 currentSize, qint64 totalSize)
 {
-    Phonon::MediaSource mediaSource(&buffer);
+    Phonon::MediaSource mediaSource(buffer);
     mediaObject->setCurrentSource(mediaSource);
     mediaObject->play();
 }

@@ -26,7 +26,7 @@ public slots:
     void pauseClicked();
     void stopClicked();
 
-    void gotTrack(QBuffer);
+    void gotTrack(QBuffer*, qint64, qint64);
 };
 
 #endif // MEDIAPLAYER_H

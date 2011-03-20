@@ -24,7 +24,8 @@ HEADERS += src/mediaplayer.h \
     src/dal/xmlrequests/pingtest.h \
     src/dal/binrequests/subrequestbin.h \
     src/gui/mainwindow.h \
-    src/gui/connecttoserverdialog.h
+    src/gui/connecttoserverdialog.h \
+    src/dal/binrequests/retrievetrackstream.h
 FORMS += src/gui/connecttoserverdialog.ui \
     src/gui/mainwindow.ui \
     src/gui/mainwindow.ui \
@@ -40,7 +41,8 @@ SOURCES += src/main.cpp \
     src/dal/xmlrequests/pingtest.cpp \
     src/dal/binrequests/subrequestbin.cpp \
     src/gui/mainwindow.cpp \
-    src/gui/connecttoserverdialog.cpp
+    src/gui/connecttoserverdialog.cpp \
+    src/dal/binrequests/retrievetrackstream.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \
@@ -55,6 +57,5 @@ OTHER_FILES += resources/media-skip-forward.png \
 
 # Output
 MOC_DIR += ./generatedfiles
-UI_DIR += ./generatedfiles
 OBJECTS_DIR += ./generatedfiles
 RCC_DIR += ./generatedfiles

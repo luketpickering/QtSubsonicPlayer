@@ -19,12 +19,13 @@ class SubRequestBin : public SubRequest
 
 signals:
 	void gedditWhileItsHot(QBuffer* _buf, qint64 _loaded, qint64 _tot);
-	void finishedBuffering(qint64 _total);
+	void finishedBuffering(qint64 _total);  
 
 protected slots:
 	void writeToBuffer();
 	void checkProgress(qint64 _cur, qint64 _tot);
-	void finishedDownloading();
+        void finishedDownloading();
+
 protected:
 	//------Functions
 	//Constructor:

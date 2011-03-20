@@ -92,7 +92,7 @@ void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
         emit requireHardReset();
 }
 
-QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
+void XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
 {
     QDomElement artist = findArtist(_artistName);
     QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
@@ -107,14 +107,12 @@ QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, Q
 
              RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
              connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
-            	,this, SLOT(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
-			 connect(rts, SIGNAL(finishedDownloading(qint64))
-            	,this, SLOT(streamFinished(qint64)));
+                ,this, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
+             connect(rts, SIGNAL(finishedBuffering(qint64))
+                ,this, SLOT(streamFinished()));
              rts->retrieve();
         }
     }
-
-    return QString();
 }
 
 // ----- END: Requests
@@ -236,7 +234,7 @@ void XMLCacheHandler::recievedAlbum(QDomDocument* _respXML)
     emit takeThisAlbumWhileStocksLast(album);
 }
 
-void XMLCacheHandler::streamFinished(qint64)
+void XMLCacheHandler::streamFinished()
 {
 	((QObject*)sender())->deleteLater();
 }

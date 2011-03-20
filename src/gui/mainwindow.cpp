@@ -103,8 +103,8 @@ void MainWindow::setMediaConnections()
             this, SLOT(setTimeElapsedLabel(qint64)));
 
     // connect
-    // connect(xch, SIGNAL(heresATrackYouPITA(QBuffer)),
-    //        mediaPlayer, SLOT(gotTrack(QBuffer)));
+    connect(xch, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)),
+            mediaPlayer, SLOT(gotTrack(QBuffer*, qint64, qint64)));
 }
 
 
@@ -321,6 +321,10 @@ void MainWindow::requestTracks(QModelIndex _index)
     {
         QString track;
         track = trackListModel->data(_index, 2).toString();
+
+        xch->requestTrack(listViewCurrentArtist,
+                          listViewCurrentAlbum,
+                          track);
 
         // replace this line by function call to get stream
         std::cout << "requesting track: "
