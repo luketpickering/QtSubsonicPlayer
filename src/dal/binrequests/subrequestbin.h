@@ -1,13 +1,16 @@
 #ifndef SUBREQUESTBIN_H
 #define SUBREQUESTBIN_H
 
-#include <qbuffer.h>
-#include <qobject.h>
-#include "../connectiondata.h"
-#include "../subrequest.h"
+#include <QObject>
+
+#include "dal/connectiondata.h"
+#include "dal/subrequest.h"
+
+// Forwards Class Definitions
+class QBuffer;
 
 /*
-	Base class for all requests that return binary data
+  Base class for all requests that return binary data
 */
 
 class SubRequestBin : public SubRequest

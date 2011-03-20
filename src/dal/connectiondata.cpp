@@ -1,13 +1,13 @@
-#include "connectiondata.h"
+#include <QString>
+#include "dal/connectiondata.h"
 
-/*
-  Constructors
-*/
+// BEGIN: Constructors ********************************************************
 
 ConnectionData::ConnectionData()
 {
     port = -1;
 }
+
 
 ConnectionData::ConnectionData(QString _host, QString _usr,
                                QString _pss, int _port)
@@ -17,3 +17,5 @@ ConnectionData::ConnectionData(QString _host, QString _usr,
     pss = _pss;
     port = _port;
 }
+
+// END: Constructors **********************************************************

@@ -2,26 +2,29 @@
 #define RETRIEVEDIRECTORY_H
 
 #include <QObject>
-#include "subrequestxml.h"
-#include "../connectiondata.h"
-#include <QtXml/QDomDocument>
+
+#include "dal/xmlrequests/subrequestxml.h"
+#include "dal/connectiondata.h"
+
+// Forward Class Definitions
+class QDomDocument;
 
 /*
-	Class to retrieve a directory contents XML from the server
+  Class to retrieve a directory contents XML from the server
 */
 
 class RetrieveDirectory : public SubRequestXML
 {
-	Q_OBJECT
+        Q_OBJECT
+
 public:
     RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent);
-	void retrieve();
+    void retrieve();
 
 
 protected:
-	//implementing the base class' pure virtual function
-	void specificXMLHandler(QDomDocument* _respXML);
-
+    //implementing the base class' pure virtual function
+    void specificXMLHandler(QDomDocument* _respXML);
 };
 
 

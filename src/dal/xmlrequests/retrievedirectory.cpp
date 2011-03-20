@@ -1,10 +1,8 @@
-#include "retrievedirectory.h"
 #include <QtXml/QDomDocument>
 
-/*
-	Constructors
-*/
+#include "dal/xmlrequests/retrievedirectory.h"
 
+// Constructor
 RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, QObject* parent) 
 	: SubRequestXML (_conndata,parent)
 {
@@ -14,9 +12,8 @@ RetrieveDirectory::RetrieveDirectory(ConnectionData* _conndata, QString _dirID, 
     params.append(QPair<QString,QString>("id",_dirID));
 }
 
-/*
-	Public Methods
-*/
+
+// BEGIN: Public Methods ******************************************************
 
 void RetrieveDirectory::retrieve()
 {
@@ -33,3 +30,5 @@ void RetrieveDirectory::specificXMLHandler(QDomDocument* _respXML)
 	emit gedditWhileItsHot(_respXML);
 
 }
+
+// END: Public Methods ********************************************************

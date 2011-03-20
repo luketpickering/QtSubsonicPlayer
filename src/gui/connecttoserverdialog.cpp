@@ -1,4 +1,4 @@
-#include "connecttoserverdialog.h"
+#include "gui/connecttoserverdialog.h"
 
 // constructor for ConnectToServerDialog
 ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)

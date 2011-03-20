@@ -1,10 +1,7 @@
-#include "retrieveindex.h"
-#include "subrequestxml.h"
+#include "dal/xmlrequests/retrieveindex.h"
+#include "dal/xmlrequests/subrequestxml.h"
 
-/*
-	Constructors
-*/
-
+// Constructor
 RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent) 
 	: SubRequestXML (_conndata,parent)
 {
@@ -13,9 +10,9 @@ RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent)
     params.append(QPair<QString,QString>("c","QtSubsonicPlayer"));
 }
 
-/*
-	Public Methods
-*/
+
+
+// BEGIN: Public Methods ******************************************************
 
 void RetrieveIndex::retrieve()
 {
@@ -23,7 +20,7 @@ void RetrieveIndex::retrieve()
 };
 
 /*
-	Inherited Virtual Functions
+  Inherited Virtual Functions
 */
 
 void RetrieveIndex::specificXMLHandler(QDomDocument* _respXML)
@@ -31,3 +28,4 @@ void RetrieveIndex::specificXMLHandler(QDomDocument* _respXML)
 	emit gedditWhileItsHot(_respXML);
 }
 
+// END: Public Methods ********************************************************

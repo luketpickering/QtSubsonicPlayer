@@ -9,11 +9,11 @@
 #include "connectiondata.h"
 
 /*
-	Abstract base class which handles all traffic to the server
-	contains methods for checkign if response is a redirect and
-	sending another response if it is. calls a pure virtual 
-	function after final response recieved which allows
-	synchronous code flow up the base/derived class tree
+  Abstract base class which handles all traffic to the server
+  contains methods for checkign if response is a redirect and
+  sending another response if it is. calls a pure virtual
+  function after final response recieved which allows
+  synchronous code flow up the base/derived class tree
 */
 
 class SubRequest : public QObject

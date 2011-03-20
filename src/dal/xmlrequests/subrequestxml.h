@@ -2,9 +2,12 @@
 #define SUBREQUESTXML_H
 
 #include <QObject>
-#include <QtXml/qdom.h>
-#include "../connectiondata.h"
-#include "../subrequest.h"
+
+#include "dal/connectiondata.h"
+#include "dal/subrequest.h"
+
+// Forward Class Definitions
+class QDomDocument;
 
 /*
 	Base class for all requests that return XML

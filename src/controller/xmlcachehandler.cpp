@@ -1,46 +1,52 @@
-#include "xmlcachehandler.h"
 #include <QFile>
 #include <QStringList>
 #include <QString>
-#include <qbuffer.h>
-#include <phonon/mediaobject.h>
+#include <QBuffer>
+#include <phonon/MediaObject>
 #include <phonon>
-#include <phonon/mediasource.h>
-#include "../dal/xmlrequests/retrieveindex.h"
-#include "../dal/connectiondata.h"
-#include "../dal/xmlrequests/retrievedirectory.h"
-#include "../dal/binrequests/retrievetrackstream.h"
+#include <phonon/MediaSource>
 #include <iostream>
+#include <QtXml/qdom.h>
+
+#include "controller/xmlcachehandler.h"
+#include "dal/xmlrequests/retrieveindex.h"
+#include "dal/connectiondata.h"
+#include "dal/xmlrequests/retrievedirectory.h"
+#include "dal/binrequests/retrievetrackstream.h"
 
 
-/*
-	Constructors
-*/
-XMLCacheHandler::XMLCacheHandler(ConnectionData* _cd, QObject* parent) : QObject(parent)
+// BEGIN: Constructors ********************************************************
+
+XMLCacheHandler::XMLCacheHandler(ConnectionData* _cd, QObject* parent)
+    : QObject(parent)
 {
     conndata = _cd;
     gotConnData = true;
     cacheFile = 0;
 }
+
+
 XMLCacheHandler::XMLCacheHandler(QObject* parent) : QObject(parent)
 {
     gotConnData = false;
     cacheFile = 0;
 }
 
-/*
-	Public Functions
-*/
+// END: Constructors **********************************************************
 
-/*
-	Requests
-*/
+
+
+
+// BEGIN: Public Functions ****************************************************
+
+// -----  BEGIN: Requests
 
 void XMLCacheHandler::requestArtistList()
 {
     connect(this, SIGNAL(cacheReady()), this, SLOT(returnArtistElement()));
     loadCache();
 }
+
 void XMLCacheHandler::requestArtistAlbums(QString _artistName)
 {
     QDomElement artist = findArtist(_artistName);
@@ -62,6 +68,7 @@ void XMLCacheHandler::requestArtistAlbums(QString _artistName)
     else
         emit requireHardReset();
 }
+
 void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
 {
     QDomElement artist = findArtist(_artistName);
@@ -84,6 +91,7 @@ void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
     else
         emit requireHardReset();
 }
+
 QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
 {
     QDomElement artist = findArtist(_artistName);
@@ -107,6 +115,9 @@ QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, Q
     return QString();
 }
 
+// ----- END: Requests
+
+
 void XMLCacheHandler::TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot)
 {
     Phonon::MediaObject* player = Phonon::createPlayer(Phonon::MusicCategory,
@@ -119,6 +130,7 @@ void XMLCacheHandler::TESTPLAYER(QBuffer* _buf, qint64 _cur, qint64 _tot)
     qint64 nuisanceRemover1 = _cur;
     nuisanceRemover1 = _tot;
 }
+
 
 void XMLCacheHandler::TESTPHONON(Phonon::State _ns,Phonon::State _os)
 {
@@ -134,10 +146,10 @@ void XMLCacheHandler::TESTPHONON(Phonon::State _ns,Phonon::State _os)
     nuisanceRemover2 = _os;
 }
 
-/*
-	Clean
-*/
 
+/*
+  Clean
+*/
 void XMLCacheHandler::hardResetCache()
 {
     // check for conection data
@@ -162,9 +174,12 @@ void XMLCacheHandler::hardResetCache()
     }
 }
 
-/*
-	Private Slots
-*/
+// END: Public Functions ******************************************************
+
+
+
+
+// BEGIN: Private Slots *******************************************************
 
 void XMLCacheHandler::saveNewCache(QDomDocument* _responsexml)
 {
@@ -176,6 +191,8 @@ void XMLCacheHandler::saveNewCache(QDomDocument* _responsexml)
     emit cacheReset();
     emit cacheReady();
 }
+
+
 void XMLCacheHandler::returnArtistElement()
 {
     //disconnect the signal to ensure we don't start sending hundreds of ready signals
@@ -184,6 +201,8 @@ void XMLCacheHandler::returnArtistElement()
     //emit the signal that its ready
     emit takeThisIndexOffMeItsCrampingMyStyle(cacheFile->firstChildElement().firstChildElement());
 }
+
+
 void XMLCacheHandler::recievedArtistsDir(QDomDocument* _respXML)
 {
     sender()->deleteLater();
@@ -191,6 +210,7 @@ void XMLCacheHandler::recievedArtistsDir(QDomDocument* _respXML)
     QDomNodeList qnl = _respXML->elementsByTagName("child");
     QDomElement parent = findArtist(_respXML->elementsByTagName("directory")
                                     .at(0).toElement().attribute("name","NULL"));
+
     if(!parent.isNull())
     {
         while(qnl.count() != 0)
@@ -209,6 +229,8 @@ void XMLCacheHandler::recievedArtistsDir(QDomDocument* _respXML)
 
     emit takeThisArtistDirectoryAwayItsJustGettingInTheWay(parent);
 }
+
+
 void XMLCacheHandler::recievedAlbum(QDomDocument* _respXML)
 {
     sender()->deleteLater();
@@ -242,13 +264,15 @@ void XMLCacheHandler::recievedAlbum(QDomDocument* _respXML)
     emit takeThisAlbumWhileStocksLast(album);
 }
 
-/*
-	Private Functions
-*/
+// END: Private Slots *********************************************************
 
 
+
+
+// BEGIN: Private Functions ***************************************************
+
 /*
-	IO
+  IO
 */
 void XMLCacheHandler::loadCache()
 {
@@ -280,6 +304,8 @@ void XMLCacheHandler::loadCache()
     else
         emit cacheReady();
 }
+
+
 bool XMLCacheHandler::loadCacheFromDisk()
 {
     //if the cachefile isnt empty
@@ -307,6 +333,8 @@ bool XMLCacheHandler::loadCacheFromDisk()
     return succ;
 
 }
+
+
 bool XMLCacheHandler::saveCacheToDisk()
 {
     if(cacheFile != 0)
@@ -326,10 +354,8 @@ bool XMLCacheHandler::saveCacheToDisk()
 }
 
 /*
-	Cache Queries
+  Cache Queries
 */
-
-
 QDomElement XMLCacheHandler::findArtist(QString _name)
 {
 
@@ -345,9 +371,13 @@ QDomElement XMLCacheHandler::findArtist(QString _name)
         QString firstLetter = QString(_name.toLocal8Bit().at(0));
 
         //stupid special case for 'The'
-        if(firstLetter.compare("T") == 0 &&  QString(_name.toLocal8Bit().at(1)).compare("h") == 0 &&
-           QString(_name.toLocal8Bit().at(2)).compare("e") == 0 && QString(_name.toLocal8Bit().at(3)).compare(" ") == 0)
+        if(firstLetter.compare("T") == 0
+           && QString(_name.toLocal8Bit().at(1)).compare("h") == 0
+           && QString(_name.toLocal8Bit().at(2)).compare("e") == 0
+           && QString(_name.toLocal8Bit().at(3)).compare(" ") == 0)
+        {
             firstLetter = QString(_name.toLocal8Bit().at(4));
+        }
 
         //allows for artists starting with a number to be obtained
         bool isNumber = false;
@@ -356,7 +386,7 @@ QDomElement XMLCacheHandler::findArtist(QString _name)
 
         //get the child of the index element
         QDomElement index = getFirstChildByAttributeValue(cacheFile->
-                                                          elementsByTagName("indexes").at(0).toElement(),"name", firstLetter);
+                            elementsByTagName("indexes").at(0).toElement(),"name", firstLetter);
 
         if(!index.isNull())
         {
@@ -376,9 +406,8 @@ QDomElement XMLCacheHandler::findArtist(QString _name)
 }
 
 /*
-	DOM helper functions
+  DOM helper functions
 */
-
 QDomElement XMLCacheHandler::getFirstChildByAttributeValue(QDomElement _toSearch,
                                                            QString _attrib, QString _value)
 {
@@ -401,10 +430,10 @@ QDomElement XMLCacheHandler::getFirstChildByAttributeValue(QDomElement _toSearch
 
 
 /*
-	Destructor
+  Destructor
 */
-XMLCacheHandler::~XMLCacheHandler(){
-
+XMLCacheHandler::~XMLCacheHandler()
+{
     if(cacheFile != 0)
     {
         delete cacheFile;
@@ -412,7 +441,12 @@ XMLCacheHandler::~XMLCacheHandler(){
 
 }
 
+// END: Private Functions *****************************************************
 
+
+
+
+// BEGIN: XML Element Handling Functions **************************************
 
 // moved from mainwindow.cpp by mjn
 /*
@@ -477,3 +511,5 @@ QString *XMLCacheHandler::getValue(QDomElement element,
 
     return 0;
 }
+
+// END: XML Element Handler Functions *****************************************

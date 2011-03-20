@@ -2,8 +2,9 @@
 #define RETRIEVEINDEX_H
 
 #include <QObject>
-#include "subrequestxml.h"
-#include "../connectiondata.h"
+
+#include "dal/xmlrequests/subrequestxml.h"
+#include "dal/connectiondata.h"
 
 /*
 	Class to retrieve a folder index from server
