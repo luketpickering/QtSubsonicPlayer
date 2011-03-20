@@ -4,13 +4,10 @@
 #include <QObject>
 #include <QtXml/qdom.h>
 #include <phonon>
+#include <QBuffer>
 
-#include "dal/connectiondata.h"
-#include "dal/xmlrequests/retrievedirectory.h"
-
-// Forward Class Definitions
-class QBuffer;
-
+#include "src/dal/connectiondata.h"
+#include "src/dal/xmlrequests/retrievedirectory.h"
 
 /*
   Class to handle the XML cache. A fresh cache will start

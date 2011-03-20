@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "dal/xmlrequests/subrequestxml.h"
-#include "dal/connectiondata.h"
+#include "src/dal/xmlrequests/subrequestxml.h"
+#include "src/dal/connectiondata.h"
 
 /*
 	Class to retrieve a folder index from server

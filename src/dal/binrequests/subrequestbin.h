@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "dal/connectiondata.h"
-#include "dal/subrequest.h"
+#include "src/dal/connectiondata.h"
+#include "src/dal/subrequest.h"
 
 // Forwards Class Definitions
 class QBuffer;

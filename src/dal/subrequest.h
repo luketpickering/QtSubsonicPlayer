@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QObject>
 #include <QUrl>
-#include "connectiondata.h"
+#include "src/dal/connectiondata.h"
 
 /*
   Abstract base class which handles all traffic to the server
