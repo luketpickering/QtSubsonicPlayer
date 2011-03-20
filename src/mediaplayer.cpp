@@ -1,6 +1,8 @@
 #include <Phonon/MediaObject>
 #include <Phonon/AudioOutput>
 #include <Phonon/MediaSource>
+#include <QBuffer>
+
 #include "mediaplayer.h"
 
 /*
@@ -22,6 +24,13 @@ MediaPlayer::MediaPlayer(QObject *parent) :
 
     mediaObject->setCurrentSource(mediaSource);
     connect(mediaObject, SIGNAL(tick(qint64)), this, SIGNAL(tock(qint64)));
+}
+
+void MediaPlayer::gotTrack(QBuffer buffer)
+{
+    Phonon::MediaSource mediaSource(&buffer);
+    mediaObject->setCurrentSource(mediaSource);
+    mediaObject->play();
 }
 
 

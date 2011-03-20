@@ -101,6 +101,10 @@ void MainWindow::setMediaConnections()
     // set up time labels
     connect(mediaPlayer, SIGNAL(tock(qint64)),
             this, SLOT(setTimeElapsedLabel(qint64)));
+
+    // connect
+    // connect(xch, SIGNAL(heresATrackYouPITA(QBuffer)),
+    //        mediaPlayer, SLOT(gotTrack(QBuffer)));
 }
 
 

@@ -5,6 +5,8 @@
 #include <Phonon/MediaObject>
 #include <Phonon/AudioOutput>
 
+class QBuffer;
+
 class MediaPlayer : public QObject
 {
 Q_OBJECT
@@ -23,6 +25,8 @@ public slots:
     void playClicked();
     void pauseClicked();
     void stopClicked();
+
+    void gotTrack(QBuffer);
 };
 
 #endif // MEDIAPLAYER_H
