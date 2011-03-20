@@ -104,7 +104,7 @@ void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
 	else {std::cout << "Already processing a signal" << std::endl;}
 }
 
-QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
+void XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
 {
 	if(!processingRequest)
 	{
@@ -121,14 +121,12 @@ QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, Q
 				processingRequest = true;
 				RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
 				connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
-				,this, SLOT(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
-				connect(rts, SIGNAL(finishedDownloading(qint64))
+                                ,this, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
+                                connect(rts, SIGNAL(finishedBuffering(qint64))
 				,this, SLOT(streamFinished(qint64)));
 				rts->retrieve();
 			}
 		}
-
-		return QString();
 	}
 	else {std::cout << "Already processing a signal" << std::endl;}
 }

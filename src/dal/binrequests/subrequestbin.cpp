@@ -4,6 +4,9 @@
 #include <QtNetwork/QNetworkReply>
 #include <QObject>
 #include <QVariant>
+
+#include <iostream>
+
 #include "subrequestbin.h"
 #include "../subrequest.h"
 
@@ -43,6 +46,7 @@ void SubRequestBin::checkProgress(qint64 _cur, qint64 _tot)
                    this, SLOT(checkProgress(qint64,qint64)));
         emit gedditWhileItsHot(buf,_cur,_tot);
     }
+    std::cout << "." << std::endl;
 }
 
 void SubRequestBin::finishedDownloading()
