@@ -244,6 +244,7 @@ void MainWindow::changeArtists(QDomElement artistsElement)
 
     artistListModel = new QStringListModel(*artistList, this);
     artistListView->setModel(artistListModel);
+    delete artistList;
 }
 
 
@@ -255,9 +256,11 @@ void MainWindow::changeArtists(QDomElement artistsElement)
 */
 void MainWindow::requestAlbums(QModelIndex _index)
 {
-    // these two lines blank the ListView while it is updated
+    // these lines blank the ListView while it is updated and prevent it
+    // from being clicked
     albumListModel = new QStringListModel(QStringList("Loading..."), this);
     albumTracksListView->setModel(albumListModel);
+    albumTracksListView->setSelectionMode(QAbstractItemView::NoSelection);
 
     listViewCurrentArtist = artistListModel->data(_index, 2).toString();
     xch->requestArtistAlbums(listViewCurrentArtist);
@@ -281,7 +284,11 @@ void MainWindow::changeAlbums(QDomElement artistElement)
 
     albumListModel = new QStringListModel(*albumList, this);
     albumTracksListView->setModel(albumListModel);
+
+    albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
+
     showingTracks = false;
+    delete albumList;
 }
 
 
@@ -293,17 +300,18 @@ void MainWindow::changeAlbums(QDomElement artistElement)
 */
 void MainWindow::requestTracks(QModelIndex _index)
 {
-
-
     if (!showingTracks)
     {
         QString album;
         album = albumListModel->data(_index, 2).toString();
-        // these two lines blank the ListView while it is updated
+        // these lines blank the ListView while it is updated and prevent it
+        // from being clicked
         trackListModel = new QStringListModel(QStringList("Loading..."), this);
         albumTracksListView->setModel(trackListModel);
+        albumTracksListView->setSelectionMode(QAbstractItemView::NoSelection);
 
-        xch->requestAlbum(listViewCurrentArtist,album);
+        listViewCurrentAlbum = album;
+        xch->requestAlbum(listViewCurrentArtist, album);
     }
     else
     {
@@ -311,7 +319,10 @@ void MainWindow::requestTracks(QModelIndex _index)
         track = trackListModel->data(_index, 2).toString();
 
         // replace this line by function call to get stream
-        std::cout << "requesting track " << qPrintable(track) << std::endl;
+        std::cout << "requesting track: "
+                  << qPrintable(listViewCurrentArtist) << " - "
+                  << qPrintable(listViewCurrentAlbum) << " - "
+                  << qPrintable(track) << std::endl;
     }
 }
 
@@ -332,6 +343,9 @@ void MainWindow::changeTracks(QDomElement albumElement)
 
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
+    albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
+
     showingTracks = true;
+    delete trackList;
 }
 

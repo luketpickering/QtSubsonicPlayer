@@ -2,8 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <Phonon/MediaObject>
-#include <Phonon/AudioOutput>
 #include <QtXml/QDomElement>
 #include "ui_mainwindow.h"
 
@@ -31,6 +29,8 @@ public:
 
     bool showingTracks;
     QString listViewCurrentArtist;
+    QString listViewCurrentAlbum;
+
     QStringListModel *artistListModel;
     QStringListModel *albumListModel;
     QStringListModel *trackListModel;
