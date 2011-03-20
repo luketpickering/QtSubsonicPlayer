@@ -2,12 +2,8 @@
 #include <QStringList>
 #include <QString>
 #include <QBuffer>
-#include <phonon/MediaObject>
-#include <phonon>
-#include <phonon/MediaSource>
 #include <iostream>
 #include <QtXml/qdom.h>
-
 #include "xmlcachehandler.h"
 #include "../dal/xmlrequests/retrieveindex.h"
 #include "../dal/connectiondata.h"
@@ -23,6 +19,7 @@ XMLCacheHandler::XMLCacheHandler(ConnectionData* _cd, QObject* parent)
     conndata = _cd;
     gotConnData = true;
     cacheFile = 0;
+	processingRequest = false;
 }
 
 
@@ -30,6 +27,7 @@ XMLCacheHandler::XMLCacheHandler(QObject* parent) : QObject(parent)
 {
     gotConnData = false;
     cacheFile = 0;
+	processingRequest = false;
 }
 
 // END: Constructors **********************************************************
@@ -43,76 +41,96 @@ XMLCacheHandler::XMLCacheHandler(QObject* parent) : QObject(parent)
 
 void XMLCacheHandler::requestArtistList()
 {
-    connect(this, SIGNAL(cacheReady()), this, SLOT(returnArtistElement()));
-    loadCache();
+	if(!processingRequest)
+	{
+		connect(this, SIGNAL(cacheReady()), this, SLOT(returnArtistElement()));
+		loadCache();
+	}
+	else {std::cout << "Already processing a signal" << std::endl;}
 }
 
 void XMLCacheHandler::requestArtistAlbums(QString _artistName)
 {
-    QDomElement artist = findArtist(_artistName);
-    if(artist.elementsByTagName("album").count() > 0)
-    {
-        emit takeThisArtistDirectoryAwayItsJustGettingInTheWay(artist);
-        std::cout << "cache already contains albums by "
-                << qPrintable(_artistName) << "." << std::endl;
-        return;
-    }
-    QString id = artist.attribute("id","null");
-    if(id.compare("null") != 0)
-    {
-        RetrieveDirectory* rd = new RetrieveDirectory(conndata,id,this);
-        connect(rd,SIGNAL(gedditWhileItsHot(QDomDocument*)),this,
-                SLOT(recievedArtistsDir(QDomDocument*)));
-        rd->retrieve();
-    }
-    else
-        emit requireHardReset();
+	if(!processingRequest)
+	{
+		QDomElement artist = findArtist(_artistName);
+		if(artist.elementsByTagName("album").count() > 0)
+		{
+			emit takeThisArtistDirectoryAwayItsJustGettingInTheWay(artist);
+			std::cout << "cache already contains albums by "
+					<< qPrintable(_artistName) << "." << std::endl;
+			return;
+		}
+		QString id = artist.attribute("id","null");
+		if(id.compare("null") != 0)
+		{
+			processingRequest = true;
+			RetrieveDirectory* rd = new RetrieveDirectory(conndata,id,this);
+			connect(rd,SIGNAL(gedditWhileItsHot(QDomDocument*)),this,
+					SLOT(recievedArtistsDir(QDomDocument*)));
+			rd->retrieve();
+		}
+		else
+			emit requireHardReset();
+	}
+	else {std::cout << "Already processing a signal" << std::endl;}
 }
 
 void XMLCacheHandler::requestAlbum(QString _artistName, QString _albumName)
 {
-    QDomElement artist = findArtist(_artistName);
-    QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
-    if(album.elementsByTagName("track").count() > 0)
-    {
-        emit takeThisAlbumWhileStocksLast(album);
-        std::cout << "cache already contains album "
-                << qPrintable(_albumName) << "." << std::endl;
-        return;
-    }
-    QString id = album.attribute("id","null");
-    if(id.compare("null") != 0)
-    {
-        RetrieveDirectory* rd = new RetrieveDirectory(conndata,id,this);
-        connect(rd,SIGNAL(gedditWhileItsHot(QDomDocument*)),this,
-                SLOT(recievedAlbum(QDomDocument*)));
-        rd->retrieve();
-    }
-    else
-        emit requireHardReset();
+	if(!processingRequest)
+	{
+		QDomElement artist = findArtist(_artistName);
+		QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
+		if(album.elementsByTagName("track").count() > 0)
+		{
+			emit takeThisAlbumWhileStocksLast(album);
+			std::cout << "cache already contains album "
+					<< qPrintable(_albumName) << "." << std::endl;
+			return;
+		}
+		QString id = album.attribute("id","null");
+		if(id.compare("null") != 0)
+		{
+			processingRequest = true;
+			RetrieveDirectory* rd = new RetrieveDirectory(conndata,id,this);
+			connect(rd,SIGNAL(gedditWhileItsHot(QDomDocument*)),this,
+					SLOT(recievedAlbum(QDomDocument*)));
+			rd->retrieve();
+		}
+		else
+			emit requireHardReset();
+	}
+	else {std::cout << "Already processing a signal" << std::endl;}
 }
 
-void XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
+QString XMLCacheHandler::requestTrack(QString _artistName, QString _albumName, QString _trackName)
 {
-    QDomElement artist = findArtist(_artistName);
-    QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
-    QDomElement track = getFirstChildByAttributeValue(album,"title",_trackName);
+	if(!processingRequest)
+	{
+		QDomElement artist = findArtist(_artistName);
+		QDomElement album = getFirstChildByAttributeValue(artist,"title",_albumName);
+		QDomElement track = getFirstChildByAttributeValue(album,"title",_trackName);
 
-    if(!track.isNull())
-    {
-        QString id = track.attribute("id","null");
-        if(id.compare("null") != 0 )
-        {
-            // commented out to make it compile!
+		if(!track.isNull())
+		{
+			QString id = track.attribute("id","null");
+			if(id.compare("null") != 0 )
+			{
+				// commented out to make it compile!
+				processingRequest = true;
+				RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
+				connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
+				,this, SLOT(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
+				connect(rts, SIGNAL(finishedDownloading(qint64))
+				,this, SLOT(streamFinished(qint64)));
+				rts->retrieve();
+			}
+		}
 
-             RetrieveTrackStream* rts = new RetrieveTrackStream(conndata,id,this);
-             connect(rts, SIGNAL(gedditWhileItsHot(QBuffer*, qint64, qint64))
-                ,this, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)));
-             connect(rts, SIGNAL(finishedBuffering(qint64))
-                ,this, SLOT(streamFinished()));
-             rts->retrieve();
-        }
-    }
+		return QString();
+	}
+	else {std::cout << "Already processing a signal" << std::endl;}
 }
 
 // ----- END: Requests
@@ -130,7 +148,7 @@ void XMLCacheHandler::hardResetCache()
             delete cacheFile;
             cacheFile = 0;
         }
-
+		processingRequest = true;
         RetrieveIndex* ri = new RetrieveIndex(conndata,this->parent());
         connect(ri,SIGNAL(gedditWhileItsHot(QDomDocument*)),this, SLOT(saveNewCache(QDomDocument*)));
         ri->retrieve();
@@ -170,6 +188,7 @@ void XMLCacheHandler::returnArtistElement()
 
     //emit the signal that its ready
     emit takeThisIndexOffMeItsCrampingMyStyle(cacheFile->firstChildElement().firstChildElement());
+	processingRequest = false;
 }
 
 
@@ -198,6 +217,7 @@ void XMLCacheHandler::recievedArtistsDir(QDomDocument* _respXML)
     }
 
     emit takeThisArtistDirectoryAwayItsJustGettingInTheWay(parent);
+	processingRequest = false;
 }
 
 
@@ -232,9 +252,10 @@ void XMLCacheHandler::recievedAlbum(QDomDocument* _respXML)
     }
 
     emit takeThisAlbumWhileStocksLast(album);
+	processingRequest = false;
 }
 
-void XMLCacheHandler::streamFinished()
+void XMLCacheHandler::streamFinished(qint64)
 {
 	((QObject*)sender())->deleteLater();
 }
