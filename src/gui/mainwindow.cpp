@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "mainwindow.h"
-#include "connecttoserverdialog.h"
+#include "gui/mainwindow.h"
+#include "gui/connecttoserverdialog.h"
 #include "mediaplayer.h"
 #include "controller/xmlcachehandler.h"
 #include "dal/connectiondata.h"
@@ -36,7 +36,7 @@ MainWindow::MainWindow()
 
 
 
-// Menu Related Methods and Slots  ********************************************
+// BEGIN: Menu Related Methods and Slots  *************************************
 
 /*
   setMenuActions() is a function which sets up the menu actions for the main
@@ -80,7 +80,7 @@ void MainWindow::about()
 
 
 
-// MediaPlayer Related Methods and Slots **************************************
+// BEGIN: MediaPlayer Related Methods and Slots *******************************
 
 /*
   setMediaActions() is a function that sets up the Media buttons and scroll
@@ -154,7 +154,7 @@ void MainWindow::setTimeElapsedLabel(qint64 _time)
 
 
 
-// ConnectToServerDialog Related Methods and Sots *****************************
+// BEGIN: ConnectToServerDialog Related Methods and Sots **********************
 
 /*
   private slot shows the "Connect To Server" dialog
@@ -195,7 +195,7 @@ void MainWindow::setServerData(QString &_srvr,
 
 
 
-// ListView Population Methods and Slots **************************************
+// BEGIN: ListView Population Methods and Slots *******************************
 
 /*
   setRequestConnections is a public method that sets up the connections between
@@ -220,10 +220,16 @@ void MainWindow::setRequestConnections()
             this, SLOT(changeTracks(QDomElement)));
 }
 
+
+/*
+  requestArtists() is a public slot that calls the XMLCacheHandler function
+  requestArtistList() in order to populate artistListView.
+*/
 void MainWindow::requestArtists()
 {
     xch->requestArtistList();
 }
+
 
 /*
   changeArtists(QDomElement) is a slot which takes a QDomElement argument uses

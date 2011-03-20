@@ -14,9 +14,7 @@ QT += phonon \
     network
 
 # Input
-HEADERS += src/connecttoserverdialog.h \
-    src/mainwindow.h \
-    src/mediaplayer.h \
+HEADERS += src/mediaplayer.h \
     src/controller/xmlcachehandler.h \
     src/dal/connectiondata.h \
     src/dal/subrequest.h \
@@ -24,12 +22,14 @@ HEADERS += src/connecttoserverdialog.h \
     src/dal/xmlrequests/retrieveindex.h \
     src/dal/xmlrequests/retrievedirectory.h \
     src/dal/xmlrequests/pingtest.h \
-    src/dal/binrequests/subrequestbin.h
-FORMS += src/connecttoserverdialog.ui \
-    src/mainwindow.ui
-SOURCES += src/connecttoserverdialog.cpp \
-    src/main.cpp \
-    src/mainwindow.cpp \
+    src/dal/binrequests/subrequestbin.h \
+    src/gui/mainwindow.h \
+    src/gui/connecttoserverdialog.h
+FORMS += src/gui/connecttoserverdialog.ui \
+    src/gui/mainwindow.ui \
+    src/gui/mainwindow.ui \
+    src/gui/connecttoserverdialog.ui
+SOURCES += src/main.cpp \
     src/mediaplayer.cpp \
     src/controller/xmlcachehandler.cpp \
     src/dal/subrequest.cpp \
@@ -38,7 +38,9 @@ SOURCES += src/connecttoserverdialog.cpp \
     src/dal/xmlrequests/retrieveindex.cpp \
     src/dal/xmlrequests/retrievedirectory.cpp \
     src/dal/xmlrequests/pingtest.cpp \
-    src/dal/binrequests/subrequestbin.cpp
+    src/dal/binrequests/subrequestbin.cpp \
+    src/gui/mainwindow.cpp \
+    src/gui/connecttoserverdialog.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \

@@ -9,6 +9,7 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
             this, SLOT(serverData()));
 }
 
+
 /*
   serverData() is a slot which gathers the text from the QLineEdits in the
   ConnectToServerDialog instance and emits a signal containing them which
