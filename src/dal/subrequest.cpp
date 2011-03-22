@@ -70,10 +70,8 @@ QUrl SubRequest::getUrl()
 }
 
 
+
 // END: Protected Methods *****************************************************
-
-
-
 
 // BEGIN: Protected Slots *****************************************************
 
@@ -154,3 +152,10 @@ void SubRequest::handleRawResponse()
 }
 
 // END: Protected Slots *******************************************************
+
+
+void SubRequest::specificHandler()
+{std::cout << "Shouldn't fire - base specific handler\n" << std::endl;}
+
+QString SubRequest::serialiseRequest()
+{std::cout << "Shouldn't fire - base serialise request\n" << std::endl; return QString();}

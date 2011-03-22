@@ -17,7 +17,10 @@ class RetrieveIndex
 
 public:
     RetrieveIndex(ConnectionData* _conndata, QObject* parent);
-    void retrieve();
+	QString serialiseRequest();
+
+signals:
+	void gotIndex(QDomDocument* _respXML);
 
 protected:
 	//implementing the base class' pure virtual function

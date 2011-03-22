@@ -8,6 +8,7 @@
 #include <QStringList>
 #include <QStringListModel>
 #include <QThread>
+#include <Phonon>
 
 #include <iostream>
 

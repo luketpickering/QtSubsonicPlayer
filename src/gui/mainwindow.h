@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtXml/QDomElement>
 #include "ui_mainwindow.h"
+#include <Phonon>
 
 class XMLCacheHandler;
 class ConnectionData;

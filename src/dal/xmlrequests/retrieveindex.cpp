@@ -14,14 +14,10 @@ RetrieveIndex::RetrieveIndex(ConnectionData* _conndata, QObject* parent)
     params.append(QPair<QString,QString>("c","QtSubsonicPlayer"));
 }
 
-
-
-// BEGIN: Public Methods ******************************************************
-
-void RetrieveIndex::retrieve()
+QString RetrieveIndex::serialiseRequest()
 {
-    makeRequest();
-};
+	return QString("IndexRequest");
+}
 
 /*
   Inherited Virtual Functions
@@ -29,7 +25,7 @@ void RetrieveIndex::retrieve()
 
 void RetrieveIndex::specificXMLHandler(QDomDocument* _respXML)
 {
-	emit gedditWhileItsHot(_respXML);
+	emit gotIndex(_respXML);
 }
 
 // END: Public Methods ********************************************************

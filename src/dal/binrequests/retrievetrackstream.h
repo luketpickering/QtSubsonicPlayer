@@ -10,7 +10,7 @@ class RetrieveTrackStream : public SubRequestBin
 public:
 	RetrieveTrackStream(ConnectionData* _conndata, QString _trackID,
 		QObject* parent);
-	void retrieve();
+	QString serialiseRequest();
 
 
 protected:

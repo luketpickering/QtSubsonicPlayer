@@ -21,11 +21,12 @@ class PingTest
 
 public:
 	PingTest(ConnectionData* _conndata, QObject* parent);
-	void test();
+	QString serialiseRequest();
 
 signals:
 	void serverPingOk();
-        void serverPingServerError(int _errorCode);
+    void serverPingServerError(int _errorCode);
+	void pingResponded();
 
 protected:
 	//implementing the base class' pure virtual function

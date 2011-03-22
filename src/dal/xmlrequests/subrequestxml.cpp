@@ -4,6 +4,7 @@
 #include <QtXml/QDomDocument>
 #include <QUrl>
 #include "subrequestxml.h"
+#include <iostream>
 
 /*
 	Protected Constructors
@@ -71,14 +72,21 @@ int SubRequestXML::isHealthySubResp()
             //response error code, if its ok return ok.
             if(responseNode.attribute("status","failed").toLocal8Bit() == "failed") 
             {
+				std::cout << respXML->toString().toLocal8Bit().constData() << std::endl;
                 bool parsedEC;
                 int eC = 0;
 
                 eC = responseNode.childNodes().item(0).toElement()
                      .attribute("code", "0").toInt(&parsedEC,10);
 
-                if (parsedEC) { return eC; }
-                else { return 0; }
+                if (parsedEC) 
+				{ 
+					return eC; 
+				}
+                else 
+				{
+					return 0; 
+				}
 
             }
             return -1;

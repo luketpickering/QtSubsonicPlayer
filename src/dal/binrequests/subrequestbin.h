@@ -17,6 +17,9 @@ class SubRequestBin : public SubRequest
 {
 	Q_OBJECT
 
+public:
+	virtual QString serialiseRequest() = 0;
+
 signals:
 	void gedditWhileItsHot(QBuffer* _buf, qint64 _loaded, qint64 _tot);
 	void finishedBuffering(qint64 _total);

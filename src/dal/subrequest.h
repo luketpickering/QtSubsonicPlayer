@@ -18,8 +18,11 @@
 
 class SubRequest : public QObject
 {
-
 	Q_OBJECT;
+
+public:
+		void makeRequest();
+		virtual QString serialiseRequest();
 
 signals:
 	void globalHostStringChanged();
@@ -44,12 +47,11 @@ protected:
 	SubRequest(QObject* parent);
 
 	//Instance Functions
-	void makeRequest();
 	QUrl getUrl();
 	bool isHttpRedirect();
 
 	//pure virtual functions
-	void virtual specificHandler() = 0;
+	virtual void specificHandler();
 
 };
 #endif

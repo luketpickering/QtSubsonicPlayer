@@ -3,22 +3,8 @@
 
 #include <QObject>
 #include <QtXml/qdom.h>
-#include <Phonon>
 #include <QBuffer>
 
-#include "../dal/connectiondata.h"
-#include "../dal/xmlrequests/retrievedirectory.h"
-
-/*
-  Class to handle the XML cache. A fresh cache will start
-  will just the folder index, as requests for data to
-  from the server is made responses are cached so less round trips
-  for future similar requests. Cache invalidation will be handled
-  by either a date stamp or a request made against cached information
-  which returns an error
-*/
-
-//TODO -- a funking ridonculous amount of error mitigation
 
 class XMLCacheHandler: public QObject
 {
@@ -26,85 +12,53 @@ class XMLCacheHandler: public QObject
 
 public:
     //----- Constructors
-    XMLCacheHandler(ConnectionData* _cd, QObject* parent);
     XMLCacheHandler(QObject* parent);
 
     //----- Destructor
     ~XMLCacheHandler();
 
-    //TODO -- write ready to recieve
+	QStringList* getCachedIndex();
+	QStringList* getCachedArtist(QString _artistName, QString* _id);
+	QStringList* getCachedAlbum(QString _artistName,
+		QString _albumName, QString* _id);
 
-    //----- Public request functions
-    void requestArtistList();
-    void requestArtistAlbums(QString _artistName);
-    void requestAlbum(QString _artistName, QString _albumName);
-    void requestTrack(QString _artistName, QString _albumName, QString _trackName);
+	bool hardResetCache(QDomDocument* _index);
+	bool saveArtist(QDomDocument* _artist, QString _artistName);
+	bool saveAlbum(QDomDocument* _album, QString _artistName,
+		QString _albumName);
 
-    // XML Handling Functions (moved here by mjn)
-    QStringList *getValuesList(const QDomElement element,
-                               const QString tagName,
-                               const QString attributeName);
-
-    QString *getValue(const QDomElement element,
-                      const QString tagName,
-                      const QString attributeName,
-                      const QString attributeValue,
-                      const QString returnAttributeName);
-
-    //----- Public clean
-    void hardResetCache();
+	//----- Functions
+    //--IO
+    bool loadCacheFromDisk();
+    bool saveCacheToDisk();
 
 signals:
 
     // Signals for external slots
-    void takeThisIndexOffMeItsCrampingMyStyle(QDomElement _requestedElement);
-    void takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement _requestedElement);
-    void takeThisAlbumWhileStocksLast(QDomElement _requestedElement);
-    void takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64);
-    void noConnectionData();
-    void requireHardReset();
+	void requireHardReset();
     void cacheReset();
-
-    // Internal Comms
-    void cacheReady();
-    void readyToSaveNewDir(RetrieveDirectory* _rd, QDomNode* _nodeToAdd);
-
-
-private slots:
-    void saveNewCache(QDomDocument* _responsexml);
-    void recievedArtistsDir(QDomDocument*);
-    void recievedAlbum(QDomDocument*);
-    void returnArtistElement();
-
-    void streamFinished(qint64);
 
 private:
     //----- Members
     //cache in memory
     QDomDocument* cacheFile;
 
-	bool processingRequest;
-
-    //connection data
-    bool gotConnData;
-    ConnectionData* conndata;
-
-    //----- Functions
-    //--IO
-    void loadCache();
-    bool loadCacheFromDisk();
-    bool saveCacheToDisk();
-
     //--Constructor
     XMLCacheHandler();
 
     //--Cache querys
     QDomElement findArtist(QString _name);
+	QStringList* parseCacheIndex();
+	QStringList* parseCacheArtistDir(QDomElement _artistEl);
+	QStringList* parseCacheAlbumDir(QDomElement _albumEl);
 
     //--DOM Helper
     QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
-                                              QString _attrib, QString _value);
-
+                                              QString _attrib, 
+											  QString _value);
+	QStringList *XMLCacheHandler::getValuesList(QDomElement element,
+                                            QString tagName,
+                                            QString attributeName);
 };
 
 #endif // XMLCACHEHANDLER_H

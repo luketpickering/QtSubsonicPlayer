@@ -11,9 +11,7 @@ RetrieveTrackStream::RetrieveTrackStream(ConnectionData* _conndata, QString _tra
     params.append(QPair<QString,QString>("id",_trackID));
 }
 
-void RetrieveTrackStream::retrieve()
+QString RetrieveTrackStream::serialiseRequest()
 {
-	makeRequest();
+	return QString("RTS-id:" + params.at(2).second);
 }
-
-void RetrieveTrackStream::specificBinHandler(QBuffer* _qbuf){}

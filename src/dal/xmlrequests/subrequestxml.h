@@ -12,13 +12,12 @@ class QDomDocument;
 /*
 	Base class for all requests that return XML
 */
-
 class SubRequestXML: public SubRequest
 {
 	Q_OBJECT
 
-signals:
-	void gedditWhileItsHot(QDomDocument* _responsexml);
+public:
+	virtual QString serialiseRequest() = 0;
 
 protected:
 	//Instance Functions
