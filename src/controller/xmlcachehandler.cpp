@@ -208,6 +208,9 @@ QDomElement XMLCacheHandler::findArtist(QString _name)
             firstLetter = QString(_name.toLocal8Bit().at(4));
         }
 
+		if(firstLetter.compare("X") == 0 || firstLetter.compare("Y") == 0 || firstLetter.compare("Z") == 0)
+			firstLetter = QString("X-Z"); 
+
         //allows for artists starting with a number to be obtained
         bool isNumber = false;
         firstLetter.toInt(&isNumber);
