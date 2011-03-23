@@ -3,8 +3,10 @@
 
 #include <QMainWindow>
 #include <QtXml/QDomElement>
-#include "ui_mainwindow.h"
 #include <phonon/phononnamespace.h>
+
+#include "ui_mainwindow.h"
+
 
 class RequestProcessor;
 class ConnectionData;

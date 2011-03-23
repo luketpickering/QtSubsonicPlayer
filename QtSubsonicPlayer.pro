@@ -29,9 +29,7 @@ HEADERS += src/mediaplayer.h \
     src/dal/xmlrequests/retrievealbumdir.h \
     src/controller/requestprocessor.h
 FORMS += src/gui/connecttoserverdialog.ui \
-    src/gui/mainwindow.ui \
-    src/gui/mainwindow.ui \
-    src/gui/connecttoserverdialog.ui
+    src/gui/mainwindow.ui
 SOURCES += src/main.cpp \
     src/mediaplayer.cpp \
     src/controller/xmlcachehandler.cpp \
@@ -60,6 +58,6 @@ OTHER_FILES += resources/media-skip-forward.png \
     README
 
 # Output
-MOC_DIR += ./generatedfiles
-OBJECTS_DIR += ./generatedfiles
-RCC_DIR += ./generatedfiles
+#MOC_DIR += ./generatedfiles
+#OBJECTS_DIR += ./generatedfiles
+#RCC_DIR += ./generatedfiles
