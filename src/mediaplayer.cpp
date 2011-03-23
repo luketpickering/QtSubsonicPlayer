@@ -2,6 +2,7 @@
 #include <Phonon/AudioOutput>
 #include <Phonon/MediaSource>
 #include <QBuffer>
+#include <iostream>
 
 #include "mediaplayer.h"
 
@@ -26,8 +27,11 @@ MediaPlayer::MediaPlayer(QObject *parent) :
 }
 
 void MediaPlayer::gotTrack(QBuffer* buffer,
-                           qint64 /*currentSize*/, qint64 /*totalSize*/)
+                           QString artist,
+                           QString album,
+                           QString track)
 {
+    std::cout << "Recieved Stream: " << std::endl;
     Phonon::MediaSource mediaSource(buffer);
     mediaObject->setCurrentSource(mediaSource);
     mediaObject->play();

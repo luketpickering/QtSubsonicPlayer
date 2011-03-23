@@ -30,7 +30,7 @@ public slots:
     void pauseClicked();
     void stopClicked();
 
-    void gotTrack(QBuffer*, qint64, qint64);
+    void gotTrack(QBuffer*,QString,QString,QString);
 };
 
 #endif // MEDIAPLAYER_H
