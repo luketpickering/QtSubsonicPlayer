@@ -23,6 +23,7 @@ MainWindow::MainWindow()
 {
     cd = new ConnectionData("hotblack.subsonic.org","49MR","49",-1);
     rp = new RequestProcessor(cd, this);
+    showingTracks = false;
 
     setupUi(this);
     mediaPlayer = new MediaPlayer(this);
@@ -358,11 +359,10 @@ void MainWindow::changeTracks(QStringList* trackList,
                              "<p>TITS (Album)</p>");
     }
 
+    showingTracks = true;
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
     albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    showingTracks = true;
     delete trackList;
 }
 
