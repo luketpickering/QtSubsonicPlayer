@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QtXml/QDomElement>
 #include "ui_mainwindow.h"
-#include <Phonon>
+#include <phonon/phononnamespace.h>
 
 class RequestProcessor;
 class ConnectionData;

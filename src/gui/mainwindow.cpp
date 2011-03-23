@@ -1,14 +1,10 @@
 #include <QtGui>
 #include <QFile>
-#include <QtXml/QDomDocument>
-#include <QtXml/QDomElement>
-#include <QtXml/QDomNode>
-#include <QtXml/QDomNodeList>
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
 #include <QThread>
-#include <Phonon>
+#include <phonon/SeekSlider>
 
 #include <iostream>
 
