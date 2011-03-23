@@ -12,6 +12,9 @@ class RequestProcessor : public QObject
 	Q_OBJECT
 public:
 
+	// Implement a bump counter for requests... prepend new requests and 'bump' queued requests. bumped requests
+	//dont fire signals to the outside world. and requests bumped 5ish times get removed.
+
 	RequestProcessor(ConnectionData* _cd, QObject* parent);
 	RequestProcessor(QObject* parent);
 

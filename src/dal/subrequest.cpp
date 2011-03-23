@@ -16,6 +16,7 @@ SubRequest::SubRequest(ConnectionData* _conndata,QObject* parent )
 {
     connData = _conndata;
     netAMan = new QNetworkAccessManager(this);
+	bumps = 0;
 }
 
 // BEGIN: Protected Methods ***************************************************
@@ -149,6 +150,15 @@ void SubRequest::handleRawResponse()
         cout << "Network Error - "
                 << qPrintable(netReply->errorString()) << endl;
     }
+}
+
+int SubRequest::bump()
+{
+	return ++bumps;
+}
+int SubRequest::checkBumps()
+{
+	return bumps;
 }
 
 // END: Protected Slots *******************************************************

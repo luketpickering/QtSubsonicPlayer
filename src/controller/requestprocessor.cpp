@@ -56,8 +56,11 @@ void RequestProcessor::responseIndex(QDomDocument* _respXML)
 	sender()->deleteLater();
 	xch.hardResetCache(_respXML);
 
-	QStringList* index = xch.getCachedIndex();
-	emit retrievedIndex(index);
+	if(((SubRequest*)sender())->checkBumps() == 0 )
+	{
+		QStringList* index = xch.getCachedIndex();
+		emit retrievedIndex(index);
+	}
 	
 	reqList.removeAt(0);
 	requestRunning = false;
@@ -107,10 +110,20 @@ void RequestProcessor::responseArtist(QDomDocument* _respXML,
 {
 	sender()->deleteLater();
 	xch.saveArtist(_respXML, _artistName);
+	int bla = ((SubRequest*)sender())->checkBumps();
 
-	QString id = QString();
-	QStringList* artistDir = xch.getCachedArtist(_artistName,&id);
-	emit retrievedArtistListing(artistDir,_artistName);
+	if(((SubRequest*)sender())->checkBumps() == 0 )
+	{
+		QString id = QString();
+		QStringList* artistDir = xch.getCachedArtist(_artistName,&id);
+		emit retrievedArtistListing(artistDir,_artistName);
+
+		std::cout << qPrintable(_artistName) << " signal was emitted\n" << std::endl;
+	}
+	else
+	{
+		std::cout << qPrintable(_artistName) << " was bumped storing, but not signalling\n" << std::endl;
+	}
 
 	reqList.removeAt(0);
 	requestRunning = false;
@@ -164,10 +177,13 @@ void RequestProcessor::responseAlbum(QDomDocument* _respXML, QString _artistName
 	sender()->deleteLater();
 	xch.saveAlbum(_respXML, _artistName, _albumName);
 
-	QString id = QString();
-	QStringList* albumDir = xch.getCachedAlbum(_artistName,
-		_albumName,&id);
-	emit retrievedAlbumListing(albumDir,_artistName, _albumName);
+	if(((SubRequest*)sender())->checkBumps() == 0 )
+	{
+		QString id = QString();
+		QStringList* albumDir = xch.getCachedAlbum(_artistName,
+			_albumName,&id);
+		emit retrievedAlbumListing(albumDir,_artistName, _albumName);
+	}
 
 	reqList.removeAt(0);
 	requestRunning = false;
@@ -200,7 +216,6 @@ void RequestProcessor::responsePing()
 	requestRunning = false;
 	runRequest();
 }
-
 void RequestProcessor::getTrack(QString _artistName, QString _albumName,
 	QString _track)
 {
@@ -209,7 +224,15 @@ void RequestProcessor::getTrack(QString _artistName, QString _albumName,
 
 bool RequestProcessor::addToQueue(SubRequest* _toAdd)
 {
-	reqList.append(_toAdd);
+	reqList.insert((reqList.count() > 0)? 1:0,_toAdd);
+
+	for(int ctr = 2; ctr < reqList.count(); ++ctr)
+	{
+		reqList.at(ctr)->bump();
+		std::cout << qPrintable(reqList.at(ctr)->serialiseRequest()) 
+			<< " bumped \n" << std::endl;
+	}
+
 	if(!requestRunning)
 		runRequest();
 	return true;

@@ -23,6 +23,8 @@ class SubRequest : public QObject
 public:
 		void makeRequest();
 		virtual QString serialiseRequest();
+		int bump();
+		int checkBumps();
 
 signals:
 	void globalHostStringChanged();
@@ -52,6 +54,8 @@ protected:
 
 	//pure virtual functions
 	virtual void specificHandler();
+private:
+	int bumps;
 
 };
 #endif
