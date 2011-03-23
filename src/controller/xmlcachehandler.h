@@ -5,7 +5,6 @@
 #include <QtXml/qdom.h>
 #include <QBuffer>
 
-
 class XMLCacheHandler: public QObject
 {
     Q_OBJECT
@@ -17,17 +16,17 @@ public:
     //----- Destructor
     ~XMLCacheHandler();
 
-	QStringList* getCachedIndex();
-	QStringList* getCachedArtist(QString _artistName, QString* _id);
-	QStringList* getCachedAlbum(QString _artistName,
-		QString _albumName, QString* _id);
+    QStringList* getCachedIndex();
+    QStringList* getCachedArtist(QString _artistName, QString* _id);
+    QStringList* getCachedAlbum(QString _artistName,
+                                QString _albumName, QString* _id);
 
-	bool hardResetCache(QDomDocument* _index);
-	bool saveArtist(QDomDocument* _artist, QString _artistName);
-	bool saveAlbum(QDomDocument* _album, QString _artistName,
-		QString _albumName);
+    bool hardResetCache(QDomDocument* _index);
+    bool saveArtist(QDomDocument* _artist, QString _artistName);
+    bool saveAlbum(QDomDocument* _album, QString _artistName,
+                   QString _albumName);
 
-	//----- Functions
+    //----- Functions
     //--IO
     bool loadCacheFromDisk();
     bool saveCacheToDisk();
@@ -35,7 +34,7 @@ public:
 signals:
 
     // Signals for external slots
-	void requireHardReset();
+    void requireHardReset();
     void cacheReset();
 
 private:
@@ -48,17 +47,18 @@ private:
 
     //--Cache querys
     QDomElement findArtist(QString _name);
-	QStringList* parseCacheIndex();
-	QStringList* parseCacheArtistDir(QDomElement _artistEl);
-	QStringList* parseCacheAlbumDir(QDomElement _albumEl);
+    QStringList* parseCacheIndex();
+    QStringList* parseCacheArtistDir(QDomElement _artistEl);
+    QStringList* parseCacheAlbumDir(QDomElement _albumEl);
 
     //--DOM Helper
     QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
                                               QString _attrib, 
-											  QString _value);
-	QStringList *XMLCacheHandler::getValuesList(QDomElement element,
-                                            QString tagName,
-                                            QString attributeName);
+                                              QString _value);
+
+    QStringList* getValuesList(QDomElement element,
+                               QString tagName,
+                               QString attributeName);
 };
 
 #endif // XMLCACHEHANDLER_H

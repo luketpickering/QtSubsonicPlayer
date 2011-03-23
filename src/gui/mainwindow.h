@@ -6,9 +6,8 @@
 #include "ui_mainwindow.h"
 #include <Phonon>
 
-class XMLCacheHandler;
+class RequestProcessor;
 class ConnectionData;
-class PingTest;
 class QDomDocument;
 class QString;
 class QStringListModel;
@@ -24,9 +23,8 @@ class MainWindow
 
 public:
     // Members
-    XMLCacheHandler *xch;
     ConnectionData *cd;
-    PingTest *pingtest;
+    RequestProcessor *rp;
 
     bool showingTracks;
     QString listViewCurrentArtist;
@@ -65,12 +63,11 @@ public slots:
     void stopButtonClicked();
     void setTimeElapsedLabel(qint64); 
 
-    void requestArtists();
-    void changeArtists(QDomElement);
     void requestAlbums(QModelIndex);
-    void changeAlbums(QDomElement);
     void requestTracks(QModelIndex);
-    void changeTracks(QDomElement);
+    void changeArtists(QStringList*);
+    void changeAlbums(QStringList*,QString);
+    void changeTracks(QStringList*,QString,QString);
 };
 
 #endif // MAINWINDOW_H

@@ -20,12 +20,14 @@ HEADERS += src/mediaplayer.h \
     src/dal/subrequest.h \
     src/dal/xmlrequests/subrequestxml.h \
     src/dal/xmlrequests/retrieveindex.h \
-    src/dal/xmlrequests/retrievedirectory.h \
     src/dal/xmlrequests/pingtest.h \
     src/dal/binrequests/subrequestbin.h \
     src/gui/mainwindow.h \
     src/gui/connecttoserverdialog.h \
-    src/dal/binrequests/retrievetrackstream.h
+    src/dal/binrequests/retrievetrackstream.h \
+    src/dal/xmlrequests/retrieveartistdir.h \
+    src/dal/xmlrequests/retrievealbumdir.h \
+    src/controller/requestprocessor.h
 FORMS += src/gui/connecttoserverdialog.ui \
     src/gui/mainwindow.ui \
     src/gui/mainwindow.ui \
@@ -37,12 +39,14 @@ SOURCES += src/main.cpp \
     src/dal/connectiondata.cpp \
     src/dal/xmlrequests/subrequestxml.cpp \
     src/dal/xmlrequests/retrieveindex.cpp \
-    src/dal/xmlrequests/retrievedirectory.cpp \
     src/dal/xmlrequests/pingtest.cpp \
     src/dal/binrequests/subrequestbin.cpp \
     src/gui/mainwindow.cpp \
     src/gui/connecttoserverdialog.cpp \
-    src/dal/binrequests/retrievetrackstream.cpp
+    src/dal/binrequests/retrievetrackstream.cpp \
+    src/dal/xmlrequests/retrieveartistdir.cpp \
+    src/dal/xmlrequests/retrievealbumdir.cpp \
+    src/controller/requestprocessor.cpp
 RESOURCES += resources/Icons.qrc
 OTHER_FILES += resources/media-skip-forward.png \
     resources/media-skip-backward.png \

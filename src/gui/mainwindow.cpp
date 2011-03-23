@@ -15,15 +15,14 @@
 #include "gui/mainwindow.h"
 #include "gui/connecttoserverdialog.h"
 #include "mediaplayer.h"
-#include "controller/xmlcachehandler.h"
+#include "controller/requestprocessor.h"
 #include "dal/connectiondata.h"
-#include "dal/xmlrequests/pingtest.h"
 
 // constructor for MainWindow
 MainWindow::MainWindow()
 {
     cd = new ConnectionData("hotblack.subsonic.org","49MR","49",-1);
-    xch = new XMLCacheHandler(cd,this);
+    rp = new RequestProcessor(cd, this);
 
     setupUi(this);
     mediaPlayer = new MediaPlayer(this);
@@ -32,7 +31,7 @@ MainWindow::MainWindow()
     setMediaConnections();
     setRequestConnections();
 
-    xch->requestArtistList();
+    rp->getIndex();
 }
 
 
@@ -104,8 +103,8 @@ void MainWindow::setMediaConnections()
             this, SLOT(setTimeElapsedLabel(qint64)));
 
     // connect
-    connect(xch, SIGNAL(takeThisTrackAwayItsScaringTheShitOuttaMe(QBuffer*, qint64, qint64)),
-            mediaPlayer, SLOT(gotTrack(QBuffer*, qint64, qint64)));
+    connect(rp, SIGNAL(retrievedOpenTrackStream(QBuffer*,QString,QString,QString)),
+            mediaPlayer, SLOT(gotTrack(QBuffer*, QString, QString, QString)));
 
 
     connect(mediaPlayer, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
@@ -232,30 +231,20 @@ void MainWindow::setServerData(QString &_srvr,
 */
 void MainWindow::setRequestConnections()
 {
-    connect(xch, SIGNAL(takeThisIndexOffMeItsCrampingMyStyle(QDomElement)),
-            this, SLOT(changeArtists(QDomElement)));
+    connect(rp, SIGNAL(retrievedIndex(QStringList*)),
+            this, SLOT(changeArtists(QStringList*)));
 
     connect(artistListView, SIGNAL(clicked(QModelIndex)),
             this, SLOT(requestAlbums(QModelIndex)));
 
-    connect(xch, SIGNAL(takeThisArtistDirectoryAwayItsJustGettingInTheWay(QDomElement)),
-            this, SLOT(changeAlbums(QDomElement)));
+    connect(rp, SIGNAL(retrievedArtistListing(QStringList*,QString)),
+            this, SLOT(changeAlbums(QStringList*,QString)));
 
     connect(albumTracksListView, SIGNAL(doubleClicked(QModelIndex)),
             this, SLOT(requestTracks(QModelIndex)));
 
-    connect(xch, SIGNAL(takeThisAlbumWhileStocksLast(QDomElement)),
-            this, SLOT(changeTracks(QDomElement)));
-}
-
-
-/*
-  requestArtists() is a public slot that calls the XMLCacheHandler function
-  requestArtistList() in order to populate artistListView.
-*/
-void MainWindow::requestArtists()
-{
-    xch->requestArtistList();
+    connect(rp, SIGNAL(retrievedAlbumListing(QStringList*,QString,QString)),
+            this, SLOT(changeTracks(QStringList*,QString,QString)));
 }
 
 
@@ -265,11 +254,8 @@ void MainWindow::requestArtists()
   this to create a QStringModelList with which is represented by the
   artistListView.
 */
-void MainWindow::changeArtists(QDomElement artistsElement)
+void MainWindow::changeArtists(QStringList* artistList)
 {
-    QStringList *artistList = xch->getValuesList(artistsElement,
-                                                 "artist", "name");
-
     artistListModel = new QStringListModel(*artistList, this);
     artistListView->setModel(artistListModel);
     delete artistList;
@@ -284,14 +270,12 @@ void MainWindow::changeArtists(QDomElement artistsElement)
 */
 void MainWindow::requestAlbums(QModelIndex _index)
 {
-    // these lines blank the ListView while it is updated and prevent it
-    // from being clicked
     albumListModel = new QStringListModel(QStringList("Loading..."), this);
     albumTracksListView->setModel(albumListModel);
     albumTracksListView->setSelectionMode(QAbstractItemView::NoSelection);
 
     listViewCurrentArtist = artistListModel->data(_index, 2).toString();
-    xch->requestArtistAlbums(listViewCurrentArtist);
+    rp->getArtist(listViewCurrentArtist);
 
     showingTracks = false;
 }
@@ -304,11 +288,14 @@ void MainWindow::requestAlbums(QModelIndex _index)
   albums for the artist and creates a QStringListModel from it. It sets
   the QStringListModel as the albumTracksListView model.
 */
-void MainWindow::changeAlbums(QDomElement artistElement)
+void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 {
-    QStringList *albumList = xch->getValuesList(artistElement,
-                                                "album",
-                                                "title");
+    if (artist != listViewCurrentArtist)
+    {
+        QMessageBox::warning(this, "Error",
+                             "<p> The album showing does not belong to the"
+                             "artist you selected.</p>");
+    }
 
     albumListModel = new QStringListModel(*albumList, this);
     albumTracksListView->setModel(albumListModel);
@@ -330,31 +317,22 @@ void MainWindow::requestTracks(QModelIndex _index)
 {
     if (!showingTracks)
     {
-        QString album;
-        album = albumListModel->data(_index, 2).toString();
-        // these lines blank the ListView while it is updated and prevent it
-        // from being clicked
         trackListModel = new QStringListModel(QStringList("Loading..."), this);
         albumTracksListView->setModel(trackListModel);
         albumTracksListView->setSelectionMode(QAbstractItemView::NoSelection);
 
-        listViewCurrentAlbum = album;
-        xch->requestAlbum(listViewCurrentArtist, album);
+        listViewCurrentAlbum = albumListModel->data(_index, 2).toString();
+        rp->getAlbum(listViewCurrentArtist,
+                     listViewCurrentAlbum);
     }
     else
     {
         QString track;
         track = trackListModel->data(_index, 2).toString();
 
-        xch->requestTrack(listViewCurrentArtist,
-                          listViewCurrentAlbum,
-                          track);
-
-        // replace this line by function call to get stream
-        std::cout << "requesting track: "
-                  << qPrintable(listViewCurrentArtist) << " - "
-                  << qPrintable(listViewCurrentAlbum) << " - "
-                  << qPrintable(track) << std::endl;
+        rp->getTrack(listViewCurrentArtist,
+                     listViewCurrentAlbum,
+                     track);
     }
 }
 
@@ -366,12 +344,19 @@ void MainWindow::requestTracks(QModelIndex _index)
   tracks for the album and creates a QStringListModel from it. It sets
   the QStringListModel as the albumTracksListView model.
 */
-void MainWindow::changeTracks(QDomElement albumElement)
+void MainWindow::changeTracks(QStringList* trackList,
+                              QString artist, QString album)
 {
-    //std::cout << qPrintable(albumElement.tagName()) << std::endl;
-    QStringList *trackList = xch->getValuesList(albumElement,
-                                                "track",
-                                                "title");
+    if (artist != listViewCurrentArtist)
+    {
+        QMessageBox::warning(this, "Error",
+                             "<p>TITS (Artist)</p>");
+    }
+    if (album != listViewCurrentAlbum)
+    {
+        QMessageBox::warning(this, "Error",
+                             "<p>TITS (Album)</p>");
+    }
 
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
