@@ -30,6 +30,7 @@ QStringList* XMLCacheHandler::getCachedIndex()
 	else 
 		return 0;
 }
+
 QStringList* XMLCacheHandler::getCachedArtist(QString _artistName,
 	QString* _id)
 {
@@ -47,6 +48,7 @@ QStringList* XMLCacheHandler::getCachedArtist(QString _artistName,
 		return 0;
 	}
 }
+
 QStringList* XMLCacheHandler::getCachedAlbum(QString _artistName, 
 	QString _albumName, QString* _id)
 {
@@ -64,6 +66,18 @@ QStringList* XMLCacheHandler::getCachedAlbum(QString _artistName,
 		*_id = album.attribute("id","null");
 		return 0;
 	}
+
+}
+QString XMLCacheHandler::getCacheTrackID(QString _artistName,
+		QString _albumName, QString _trackName)
+{
+	QDomElement artist = findArtist(_artistName);
+	QDomElement album = getFirstChildByAttributeValue(artist,
+		"title",_albumName);
+	QDomElement track = getFirstChildByAttributeValue(album,
+		"title", _trackName);
+
+	return track.attribute("id", "null");
 
 }
 

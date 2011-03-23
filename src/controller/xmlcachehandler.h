@@ -21,6 +21,8 @@ public:
 	QStringList* getCachedArtist(QString _artistName, QString* _id);
 	QStringList* getCachedAlbum(QString _artistName,
 		QString _albumName, QString* _id);
+	QString getCacheTrackID(QString _artistName,
+		QString _albumName, QString _trackName);
 
 	bool hardResetCache(QDomDocument* _index);
 	bool saveArtist(QDomDocument* _artist, QString _artistName);
@@ -56,7 +58,7 @@ private:
     QDomElement getFirstChildByAttributeValue(QDomElement _toSearch,
                                               QString _attrib, 
 											  QString _value);
-	QStringList *XMLCacheHandler::getValuesList(QDomElement element,
+	QStringList * getValuesList(QDomElement element,
                                             QString tagName,
                                             QString attributeName);
 };

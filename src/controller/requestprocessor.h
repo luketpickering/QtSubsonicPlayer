@@ -12,8 +12,7 @@ class RequestProcessor : public QObject
 	Q_OBJECT
 public:
 
-	// Implement a bump counter for requests... prepend new requests and 'bump' queued requests. bumped requests
-	//dont fire signals to the outside world. and requests bumped 5ish times get removed.
+	//make it so that save is not every cache response.
 
 	RequestProcessor(ConnectionData* _cd, QObject* parent);
 	RequestProcessor(QObject* parent);
@@ -46,7 +45,7 @@ private slots:
 	void responseArtist(QDomDocument* _respXML, QString _artistName);
 	void responseAlbum(QDomDocument* _respXML, QString _artistName, 
 		QString _albumName);
-	void responseTrack(QDomDocument* _respXML, QString _artistName, 
+	void responseTrackStream(QBuffer* _buf, QString _artistName, 
 		QString _albumName, QString _track);
 	void responsePing();
 
@@ -57,7 +56,7 @@ private:
 	bool requestRunning;
 
 	void runRequest();
-	bool addToQueue(SubRequest* _toAdd);
+	void addToQueue(SubRequest* _toAdd);
 
 	bool checkAlreadyQueued(SubRequest* _toCheck);
 

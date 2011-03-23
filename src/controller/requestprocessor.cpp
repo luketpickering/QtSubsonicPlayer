@@ -10,6 +10,7 @@
 #include "../dal/xmlrequests/retrieveartistdir.h"
 #include "../dal/xmlrequests/retrievealbumdir.h"
 #include "../dal/xmlrequests/pingtest.h"
+#include "../dal/binrequests/retrievetrackstream.h"
 
 
 RequestProcessor::RequestProcessor(ConnectionData* _cd, QObject* parent) : QObject(parent), xch(parent)
@@ -77,7 +78,8 @@ void RequestProcessor::getArtist(QString _artistName)
 	{
 		if(id.compare("null") == 0)
 		{
-			std::cout << "null id found\n" << std::endl;
+			std::cout << "cannot find id for Artist directory " <<
+			qPrintable(_artistName) << "\n" << std::endl;
 			//do hard reset
 		}
 		else
@@ -140,7 +142,8 @@ void RequestProcessor::getAlbum(QString _artistName, QString _albumName)
 	{
 		if(id.compare("null") == 0)
 		{
-			std::cout << "null id found\n" << std::endl;
+			std::cout << "cannot find id for album " <<
+			qPrintable(_albumName) << "\n" << std::endl;
 			//do hard reset
 		}
 		else
@@ -216,13 +219,43 @@ void RequestProcessor::responsePing()
 	requestRunning = false;
 	runRequest();
 }
+
 void RequestProcessor::getTrack(QString _artistName, QString _albumName,
 	QString _track)
 {
+	QString id = xch.getCacheTrackID( _artistName, _albumName, _track);
 
+	if(id.compare("null") == 0)
+	{
+		std::cout << "cannot find id for track " <<
+			qPrintable(_track) << "\n" << std::endl;
+			//do hard reset
+	}
+	else
+	{
+		RetrieveTrackStream* reqRts = 
+			new RetrieveTrackStream(connData, id,
+			 _artistName, _albumName, _track, this); 
+
+		connect(reqRts, SIGNAL(gotTrackStream(QBuffer*,
+			QString, QString, QString)),
+			this,SLOT(responseTrackStream(QBuffer*, 
+			QString, QString, QString)));
+
+		addToQueue(reqRts);
+	}
+}
+void RequestProcessor::responseTrackStream(QBuffer* _buf, 
+	QString _artistName, QString _albumName, QString _track)
+{
+	emit retrievedOpenTrackStream(_buf, _artistName, _albumName, _track);
+
+	reqList.removeAt(0);
+	requestRunning = false;
+	runRequest();
 }
 
-bool RequestProcessor::addToQueue(SubRequest* _toAdd)
+void RequestProcessor::addToQueue(SubRequest* _toAdd)
 {
 	reqList.insert((reqList.count() > 0)? 1:0,_toAdd);
 
@@ -235,9 +268,7 @@ bool RequestProcessor::addToQueue(SubRequest* _toAdd)
 
 	if(!requestRunning)
 		runRequest();
-	return true;
 }
-
 void RequestProcessor::runRequest()
 {
 	if(reqList.length() > 0 && requestRunning == false)
@@ -246,9 +277,6 @@ void RequestProcessor::runRequest()
 		reqList.at(0)->makeRequest();
 	}
 }
-
-void RequestProcessor::responseTrack(QDomDocument* _respXML, QString _artistName, 
-	QString _albumName, QString _track){}
 
 bool RequestProcessor::checkAlreadyQueued(SubRequest* _toCheck)
 {
