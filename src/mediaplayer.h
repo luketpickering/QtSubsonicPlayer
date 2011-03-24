@@ -15,6 +15,10 @@ public:
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
 
+    QString serverpath;
+    QString username;
+    QString password;
+
     int tickInterval;
 
     explicit MediaPlayer(QObject *parent = 0);
@@ -30,7 +34,7 @@ public slots:
     void pauseClicked();
     void stopClicked();
 
-    void gotTrack(QBuffer*,QString,QString,QString);
+    void gotTrack(QString,int);
 };
 
 #endif // MEDIAPLAYER_H

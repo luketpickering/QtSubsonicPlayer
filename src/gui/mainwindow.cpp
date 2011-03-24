@@ -17,12 +17,20 @@
 // constructor for MainWindow
 MainWindow::MainWindow()
 {
-    cd = new ConnectionData("hotblack.subsonic.org","49MR","49",-1);
-    rp = new RequestProcessor(cd, this);
-    showingTracks = false;
-
     setupUi(this);
     mediaPlayer = new MediaPlayer(this);
+
+    // for testing
+    mediaPlayer->serverpath = "hotblack.subsonic.org";
+    mediaPlayer->username = "michael";
+    mediaPlayer->password = "america";
+
+    cd = new ConnectionData(mediaPlayer->serverpath,
+                            mediaPlayer->username,
+                            mediaPlayer->password,-1);
+
+    rp = new RequestProcessor(cd, this);
+    showingTracks = false;
 
     setMenuConnections();
     setMediaConnections();
@@ -209,9 +217,9 @@ void MainWindow::setServerData(QString &_srvr,
                                QString &_uname,
                                QString &_passwd)
 {
-    serverpath = _srvr;
-    username = _uname;
-    password = _passwd;
+    mediaPlayer->serverpath = _srvr;
+    mediaPlayer->username = _uname;
+    mediaPlayer->password = _passwd;
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -327,6 +335,7 @@ void MainWindow::requestTracks(QModelIndex _index)
         QString track;
         track = trackListModel->data(_index, 2).toString();
 
+        std::cout << "Requesting Stream" << std::endl;
         rp->getTrack(listViewCurrentArtist,
                      listViewCurrentAlbum,
                      track);

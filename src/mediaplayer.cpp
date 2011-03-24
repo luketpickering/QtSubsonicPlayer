@@ -2,6 +2,7 @@
 #include <Phonon/AudioOutput>
 #include <Phonon/MediaSource>
 #include <QBuffer>
+#include <QUrl>
 #include <iostream>
 
 #include "mediaplayer.h"
@@ -26,13 +27,15 @@ MediaPlayer::MediaPlayer(QObject *parent) :
             this, SIGNAL(totalTimeChanged(qint64)));
 }
 
-void MediaPlayer::gotTrack(QBuffer* buffer,
-                           QString artist,
-                           QString album,
-                           QString track)
+void MediaPlayer::gotTrack(QString _id,
+                           int _length)
 {
-    std::cout << "Recieved Stream: " << std::endl;
-    Phonon::MediaSource mediaSource(buffer);
+    std::cout << "Recieved Stream" << std::endl;
+    QUrl url("http://" + serverpath + "/rest/stream.view?u=" + username
+             + "&p=" + password + "&v=1.5.0" + "&c=QtSubsonicPlayer"
+             + "&id=" + _id);
+
+    Phonon::MediaSource mediaSource(url);
     mediaObject->setCurrentSource(mediaSource);
     mediaObject->play();
 }
