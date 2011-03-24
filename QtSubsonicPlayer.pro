@@ -14,7 +14,7 @@ QT += phonon \
     network
 
 # Input
-HEADERS += src/mediaplayer.h \
+HEADERS += \
     src/controller/xmlcachehandler.h \
     src/dal/connectiondata.h \
     src/dal/subrequest.h \
@@ -31,7 +31,6 @@ HEADERS += src/mediaplayer.h \
 FORMS += src/gui/connecttoserverdialog.ui \
     src/gui/mainwindow.ui
 SOURCES += src/main.cpp \
-    src/mediaplayer.cpp \
     src/controller/xmlcachehandler.cpp \
     src/dal/subrequest.cpp \
     src/dal/connectiondata.cpp \

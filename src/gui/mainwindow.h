@@ -2,20 +2,17 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtXml/QDomElement>
-#include <phonon/phononnamespace.h>
+#include <phonon/MediaObject>
+#include <phonon/AudioOutput>
 
 #include "ui_mainwindow.h"
 
 
 class RequestProcessor;
 class ConnectionData;
-class QDomDocument;
 class QString;
 class QStringListModel;
 class ConnectToServerDialog;
-class MediaPlayer;
-class QBuffer;
 
 class MainWindow
     : public QMainWindow,
@@ -27,6 +24,10 @@ public:
     // Members
     ConnectionData *cd;
     RequestProcessor *rp;
+
+    Phonon::MediaObject *mediaObject;
+    Phonon::AudioOutput *audioOutput;
+    int tickInterval;
 
     bool showingTracks;
     QString listViewCurrentArtist;
@@ -40,8 +41,6 @@ public:
     QString username;
     QString password;
 
-    MediaPlayer *mediaPlayer;
-
     // Methods
     MainWindow();
 
@@ -50,19 +49,16 @@ signals:
     void mediaPause();
 
 private:
-    void setMenuConnections();
-    void setMediaConnections();
-    void setRequestConnections();
+    void setupMenu();
+    void setupMedia();
+    void setupRequests();
 
 public slots:
     void about();
-
     void connectToServer();
     void setServerData(QString&, QString&, QString&);
 
-    void mediaPlayerChange(Phonon::State);
-    void playPauseClicked(bool);
-    void stopButtonClicked();
+    void playPauseClicked();
     void setTimeElapsedLabel(qint64); 
 
     void requestAlbums(QModelIndex);
@@ -70,6 +66,7 @@ public slots:
     void changeArtists(QStringList*);
     void changeAlbums(QStringList*,QString);
     void changeTracks(QStringList*,QString,QString);
+    void gotTrack(QString,int);
 };
 
 #endif // MAINWINDOW_H

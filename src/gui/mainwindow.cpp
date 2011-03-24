@@ -1,16 +1,16 @@
 #include <QtGui>
-#include <QFile>
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
-#include <QThread>
 #include <phonon/SeekSlider>
+#include <phonon/MediaObject>
+#include <phonon/AudioOutput>
+#include <phonon/MediaSource>
 
 #include <iostream>
 
 #include "gui/mainwindow.h"
 #include "gui/connecttoserverdialog.h"
-#include "mediaplayer.h"
 #include "controller/requestprocessor.h"
 #include "dal/connectiondata.h"
 
@@ -18,23 +18,25 @@
 MainWindow::MainWindow()
 {
     setupUi(this);
-    mediaPlayer = new MediaPlayer(this);
+
+    mediaObject = new Phonon::MediaObject(this);
+    audioOutput = new Phonon::AudioOutput(this);
+    Phonon::createPath(mediaObject, audioOutput);
+    tickInterval = 1000;
 
     // for testing
-    mediaPlayer->serverpath = "hotblack.subsonic.org";
-    mediaPlayer->username = "michael";
-    mediaPlayer->password = "america";
+    serverpath = "hotblack.subsonic.org";
+    username = "michael";
+    password = "america";
 
-    cd = new ConnectionData(mediaPlayer->serverpath,
-                            mediaPlayer->username,
-                            mediaPlayer->password,-1);
-
+    cd = new ConnectionData(serverpath, username, password,-1);
     rp = new RequestProcessor(cd, this);
+
     showingTracks = false;
 
-    setMenuConnections();
-    setMediaConnections();
-    setRequestConnections();
+    setupMenu();
+    setupRequests();
+    setupMedia();
 
     rp->getIndex();
 }
@@ -47,7 +49,7 @@ MainWindow::MainWindow()
   setMenuActions() is a function which sets up the menu actions for the main
   menubar of MainWindow.
 */
-void MainWindow::setMenuConnections()
+void MainWindow::setupMenu()
 {
     // set up "About Qt" action
     connect(actionAboutQt, SIGNAL(triggered()),
@@ -91,82 +93,56 @@ void MainWindow::about()
   setMediaActions() is a function that sets up the Media buttons and scroll
   bar and connects them with the mediaObject.
 */
-void MainWindow::setMediaConnections()
+void MainWindow::setupMedia()
 {
     // set the SeekSlider to work with mediaPlayer's mediaObject
-    seekSlider->setMediaObject(mediaPlayer->mediaObject);
+    seekSlider->setMediaObject(mediaObject);
 
     // set up Play/Pause/Stop buttons
     connect(playPauseButton, SIGNAL(clicked(bool)),
-            this, SLOT(playPauseClicked(bool)));
+            this, SLOT(playPauseClicked()));
 
     connect(stopButton, SIGNAL(clicked()),
-            this, SLOT(stopButtonClicked()));
+            mediaObject, SLOT(stop()));
 
     // set up time labels
-    connect(mediaPlayer, SIGNAL(tock(qint64)),
+    connect(mediaObject, SIGNAL(tick(qint64)),
             this, SLOT(setTimeElapsedLabel(qint64)));
 
-    // connect
     connect(rp, SIGNAL(retrievedTrackData(QString,int)),
-            mediaPlayer, SLOT(gotTrack(QString,int)));
-
-
-    connect(mediaPlayer, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
-            this, SLOT(mediaPlayerChange(Phonon::State)));
-
-    connect(mediaPlayer, SIGNAL(totalTimeChanged(qint64)),
-            seekSlider, SLOT(update()));
+            this, SLOT(gotTrack(QString,int)));
 }
 
-void MainWindow::mediaPlayerChange(Phonon::State _newState)
+void MainWindow::gotTrack(QString _id, int _length)
 {
-    if (_newState == Phonon::PlayingState)
-    {
-        playPauseButton->
-                setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
-        playPauseButton->setChecked(true);
-    }
-    else if (_newState == Phonon::PausedState
-        || _newState == Phonon::StoppedState)
-    {
-        playPauseButton->
-                setIcon(QIcon(":/mediaicons/media-playback-start.png"));
-        playPauseButton->setChecked(false);
-    }
+    std::cout << "Recieved Stream" << std::endl;
+    QUrl url("http://" + serverpath + "/rest/stream.view?u=" + username
+             + "&p=" + password + "&v=1.5.0" + "&c=QtSubsonicPlayer"
+             + "&id=" + _id);
+
+    Phonon::MediaSource mediaSource(url);
+    mediaObject->setCurrentSource(mediaSource);
+    mediaObject->play();
 }
 
-void MainWindow::playPauseClicked(bool play)
+void MainWindow::playPauseClicked()
 {
-    if (!play)
+    if(mediaObject->state() ==  Phonon::PlayingState)
     {
-        playPauseButton->
-                setIcon(QIcon(":/mediaicons/media-playback-start.png"));
-        mediaPlayer->pauseClicked();
+        mediaObject->pause();
     }
     else
     {
-        playPauseButton->
-                setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
-        mediaPlayer->playClicked();
+        mediaObject->play();
     }
 }
 
-void MainWindow::stopButtonClicked()
-{
-    mediaPlayer->stopClicked();
-
-    playPauseButton->setChecked(false);
-    playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-start.png"));
-}
-
 /*
-  setTimeElapsedLabel(int) is a slot which sets the timeElapsedLabel text
-  independently of the timeLeftLabel.
+  slot which sets the timeElapsedLabel text
 */
 void MainWindow::setTimeElapsedLabel(qint64 _time)
 {
-    int time = _time/mediaPlayer->tickInterval;
+    int time = _time/tickInterval;
     QString timeElapsed;
 
     timeElapsed.append(QString::number(time/60));
@@ -217,9 +193,9 @@ void MainWindow::setServerData(QString &_srvr,
                                QString &_uname,
                                QString &_passwd)
 {
-    mediaPlayer->serverpath = _srvr;
-    mediaPlayer->username = _uname;
-    mediaPlayer->password = _passwd;
+    serverpath = _srvr;
+    username = _uname;
+    password = _passwd;
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -229,12 +205,7 @@ void MainWindow::setServerData(QString &_srvr,
 
 // BEGIN: ListView Population Methods and Slots *******************************
 
-/*
-  setRequestConnections is a public method that sets up the connections between
-  the ListView objects and the requests to the xmlcache for the xml elements
-  in order to set the list views.
-*/
-void MainWindow::setRequestConnections()
+void MainWindow::setupRequests()
 {
     connect(rp, SIGNAL(retrievedIndex(QStringList*)),
             this, SLOT(changeArtists(QStringList*)));
@@ -253,12 +224,6 @@ void MainWindow::setRequestConnections()
 }
 
 
-/*
-  changeArtists(QDomElement) is a slot which takes a QDomElement argument uses
-  the xml to create a QStringList with all of the artist names and then uses
-  this to create a QStringModelList with which is represented by the
-  artistListView.
-*/
 void MainWindow::changeArtists(QStringList* artistList)
 {
     artistListModel = new QStringListModel(*artistList, this);
@@ -286,13 +251,6 @@ void MainWindow::requestAlbums(QModelIndex _index)
 }
 
 
-/*
-  changeAlbums(QDomElement) is a slot which takes a QDomElement arguement
-  from the xml cache's signal (which was requested by
-  requestAlbums(QModelIndex)) and uses that QDomElement get a QStringList of
-  albums for the artist and creates a QStringListModel from it. It sets
-  the QStringListModel as the albumTracksListView model.
-*/
 void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 {
     if (artist != listViewCurrentArtist)
@@ -312,12 +270,6 @@ void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 }
 
 
-/*
-  requestTracks(QModelIndex) is a slot which takes a QModelIndex argument from
-  the albumTracksListView doubleclicked(QModelIndex) slot and uses it to find
-  the album title that was clicked from the albumListModel and then sends a
-  request to the xml cache for the album's tracks.
-*/
 void MainWindow::requestTracks(QModelIndex _index)
 {
     if (!showingTracks)
@@ -332,6 +284,8 @@ void MainWindow::requestTracks(QModelIndex _index)
     }
     else
     {
+        mediaObject->stop();
+
         QString track;
         track = trackListModel->data(_index, 2).toString();
 
@@ -342,14 +296,6 @@ void MainWindow::requestTracks(QModelIndex _index)
     }
 }
 
-
-/*
-  changeTracks(QDomElement) is a slot which takes a QDomElement arguement
-  from the xml cache's signal (which was requested by
-  requestTracks(QModelIndex)) and uses that QDomElement get a QStringList of
-  tracks for the album and creates a QStringListModel from it. It sets
-  the QStringListModel as the albumTracksListView model.
-*/
 void MainWindow::changeTracks(QStringList* trackList,
                               QString artist, QString album)
 {
