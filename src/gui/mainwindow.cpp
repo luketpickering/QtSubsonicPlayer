@@ -7,36 +7,31 @@
 #include <phonon/AudioOutput>
 #include <phonon/MediaSource>
 
-#include <iostream>
-
 #include "gui/mainwindow.h"
 #include "gui/connecttoserverdialog.h"
 #include "controller/requestprocessor.h"
 #include "dal/connectiondata.h"
 
+#include  <iostream>
+
 // constructor for MainWindow
 MainWindow::MainWindow()
 {
     setupUi(this);
+    setupMenu();
 
     mediaObject = new Phonon::MediaObject(this);
     audioOutput = new Phonon::AudioOutput(this);
     Phonon::createPath(mediaObject, audioOutput);
     tickInterval = 1000;
 
-    // for testing
-    serverpath = "hotblack.subsonic.org";
-    username = "michael";
-    password = "america";
-
-    cd = new ConnectionData(serverpath, username, password,-1);
-    rp = new RequestProcessor(cd, this);
+    setupMedia();
 
     showingTracks = false;
 
-    setupMenu();
+    connectToServer(true);
+
     setupRequests();
-    setupMedia();
 
     rp->getIndex();
 }
@@ -46,8 +41,8 @@ MainWindow::MainWindow()
 // BEGIN: Menu Related Methods and Slots  *************************************
 
 /*
-  setMenuActions() is a function which sets up the menu actions for the main
-  menubar of MainWindow.
+  private method which sets up the menu actions for the main menubar of
+  MainWindow.
 */
 void MainWindow::setupMenu()
 {
@@ -70,7 +65,7 @@ void MainWindow::setupMenu()
 
 
 /*
-  about() is a private slot which shows the "About Subsonic Player" QMessageBox
+  slot which shows the "About Subsonic Player" QMessageBox
 */
 void MainWindow::about()
 {
@@ -85,13 +80,72 @@ void MainWindow::about()
 
 
 
+// BEGIN: ConnectToServerDialog Related Methods and Sots **********************
+
+/*
+  private slot shows the "Connect To Server" dialog
+*/
+void MainWindow::connectToServer(bool firstRun)
+{
+    ConnectToServerDialog *connectToServerDialog =
+            new ConnectToServerDialog(this);
+
+    if(!firstRun)
+    {
+        delete cd;
+        delete rp;
+
+        disconnect(this, SLOT(connectToServerFirstRunErr()));
+    }
+    else
+    {
+        connect(connectToServerDialog, SIGNAL(rejected()),
+                this, SLOT(connectToServerFirstRunErr()));
+    }
+
+    // connect the signal from connectToServerDialog to the setServerData slot
+    connect(connectToServerDialog,
+            SIGNAL(serverDetailsEntered(QString&, QString&, QString&)),
+            this, SLOT(setServerData(QString&,QString&,QString&)));
+
+    connectToServerDialog->exec();
+}
+
+
+/*
+  slot: setData(QString x3) sets the values of public members
+  server, username and password from the values input by the user
+  in the ConnectToServerDialog
+*/
+void MainWindow::setServerData(QString &_srvr,
+                               QString &_uname,
+                               QString &_passwd)
+{
+    serverpath = _srvr;
+    username = _uname;
+    password = _passwd;
+
+    cd = new ConnectionData(serverpath, username, password,-1);
+    rp = new RequestProcessor(cd, this);
+}
+
+void MainWindow::connectToServerFirstRunErr()
+{
+    QMessageBox::warning(this, "Warning",
+                         "<p>You must enter server details.</p>");
+
+    connectToServer(true);
+}
+
+// END: ConnectToServerDialog Related Methods and Slots ***********************
+
 
 
 // BEGIN: MediaPlayer Related Methods and Slots *******************************
 
 /*
-  setMediaActions() is a function that sets up the Media buttons and scroll
-  bar and connects them with the mediaObject.
+  private method that sets up the Media buttons and scroll bar and connects
+  them with the mediaObject.
 */
 void MainWindow::setupMedia()
 {
@@ -103,38 +157,75 @@ void MainWindow::setupMedia()
             this, SLOT(playPauseClicked()));
 
     connect(stopButton, SIGNAL(clicked()),
-            mediaObject, SLOT(stop()));
+            this, SLOT(stopClicked()));
 
     // set up time labels
     connect(mediaObject, SIGNAL(tick(qint64)),
-            this, SLOT(setTimeElapsedLabel(qint64)));
+            this, SLOT(setTimeLabels(qint64)));
 
-    connect(rp, SIGNAL(retrievedTrackData(QString,int)),
-            this, SLOT(gotTrack(QString,int)));
+    connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+            this, SLOT(moStateChanged(Phonon::State)));
 }
 
-void MainWindow::gotTrack(QString _id, int _length)
+void MainWindow::recieveTrack(QString _id, int _length)
 {
-    std::cout << "Recieved Stream" << std::endl;
     QUrl url("http://" + serverpath + "/rest/stream.view?u=" + username
              + "&p=" + password + "&v=1.5.0" + "&c=QtSubsonicPlayer"
              + "&id=" + _id);
 
     Phonon::MediaSource mediaSource(url);
     mediaObject->setCurrentSource(mediaSource);
+
+    currentTrackTotalTime = _length;
+
+    this->setWindowTitle("QtSubsonicPlayer: " + listViewCurrentArtist
+                         + " - " + currentTrack);
+
+    // for some reason the track will only play immediately is played, paused
+    // and then played again.
+    mediaObject->play();
+    mediaObject->pause();
     mediaObject->play();
 }
 
 void MainWindow::playPauseClicked()
 {
-    if(mediaObject->state() ==  Phonon::PlayingState)
+    if (playPauseButton->isChecked())
     {
-        mediaObject->pause();
+        playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
+        mediaObject->play();
     }
     else
     {
-        mediaObject->play();
+        mediaObject->pause();
+        playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-start.png"));
     }
+}
+
+void MainWindow::stopClicked()
+{
+    if (playPauseButton->isChecked())
+    {
+        playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-start.png"));
+        playPauseButton->setChecked(false);
+    }
+
+    mediaObject->stop();
+}
+
+void MainWindow::moStateChanged(Phonon::State state)
+{
+    if(state == Phonon::PlayingState)
+    {
+        playPauseButton->setIcon(QIcon(":/mediaicons/media-playback-pause.png"));
+        playPauseButton->setChecked(true);
+    }
+}
+
+void MainWindow::setTimeLabels(qint64 _time)
+{
+    setTimeElapsedLabel(_time);
+    setTimeRemainingLabel(_time);
 }
 
 /*
@@ -157,48 +248,26 @@ void MainWindow::setTimeElapsedLabel(qint64 _time)
     timeElapsedLabel->setText(timeElapsed);
 }
 
+void MainWindow::setTimeRemainingLabel(qint64 currentTime_ms)
+{
+    int currentTime = currentTime_ms/tickInterval;
+    int time = currentTrackTotalTime - currentTime;
+
+    QString timeRemaining;
+
+    timeRemaining.append(QString::number(time/60));
+    timeRemaining.append(":");
+
+    if (time%60 < 10) {
+        timeRemaining.append("0");
+    }
+
+    timeRemaining.append(QString::number(time%60));
+
+    timeRemainingLabel->setText(timeRemaining);
+}
+
 // END: Media Related Methods and Slots ***************************************
-
-
-
-
-// BEGIN: ConnectToServerDialog Related Methods and Sots **********************
-
-/*
-  private slot shows the "Connect To Server" dialog
-*/
-void MainWindow::connectToServer()
-{
-    ConnectToServerDialog *connectToServerDialog =
-            new ConnectToServerDialog(this);
-
-    // connect the signal from connectToServerDialog to the setServerData slot
-    connect(connectToServerDialog,
-            SIGNAL(serverDetailsEntered(QString&, QString&, QString&)),
-            this, SLOT(setServerData(QString&,QString&,QString&)));
-
-    QMessageBox::warning(this, tr("ERROR ERROR ERROR!"),
-                         tr("<p>This does nothing yet!!!!!!!1!!!one!!!</p>"));
-
-    connectToServerDialog->exec();
-}
-
-
-/*
-  slot: setData(QString x3) sets the values of public members
-  server, username and password from the values input by the user
-  in the ConnectToServerDialog
-*/
-void MainWindow::setServerData(QString &_srvr,
-                               QString &_uname,
-                               QString &_passwd)
-{
-    serverpath = _srvr;
-    username = _uname;
-    password = _passwd;
-}
-
-// END: ConnectToServerDialog Related Methods and Slots ***********************
 
 
 
@@ -221,6 +290,9 @@ void MainWindow::setupRequests()
 
     connect(rp, SIGNAL(retrievedAlbumListing(QStringList*,QString,QString)),
             this, SLOT(changeTracks(QStringList*,QString,QString)));
+
+    connect(rp, SIGNAL(retrievedTrackData(QString,int)),
+            this, SLOT(recieveTrack(QString,int)));
 }
 
 
@@ -253,13 +325,6 @@ void MainWindow::requestAlbums(QModelIndex _index)
 
 void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 {
-    if (artist != listViewCurrentArtist)
-    {
-        QMessageBox::warning(this, "Error",
-                             "<p> The album showing does not belong to the"
-                             "artist you selected.</p>");
-    }
-
     albumListModel = new QStringListModel(*albumList, this);
     albumTracksListView->setModel(albumListModel);
 
@@ -272,7 +337,22 @@ void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 
 void MainWindow::requestTracks(QModelIndex _index)
 {
-    if (!showingTracks)
+    if (showingTracks)
+    {
+        timeElapsedLabel->setText("-");
+        timeRemainingLabel->setText("-");
+        this->setWindowTitle("QtSubsonicPlayer: Buffering");
+        mediaObject->stop();
+
+        QString track;
+        track = trackListModel->data(_index, 2).toString();
+        currentTrack = track;
+
+        rp->getTrack(listViewCurrentArtist,
+                     listViewCurrentAlbum,
+                     track);
+    }
+    else
     {
         trackListModel = new QStringListModel(QStringList("Loading..."), this);
         albumTracksListView->setModel(trackListModel);
@@ -282,34 +362,11 @@ void MainWindow::requestTracks(QModelIndex _index)
         rp->getAlbum(listViewCurrentArtist,
                      listViewCurrentAlbum);
     }
-    else
-    {
-        mediaObject->stop();
-
-        QString track;
-        track = trackListModel->data(_index, 2).toString();
-
-        std::cout << "Requesting Stream" << std::endl;
-        rp->getTrack(listViewCurrentArtist,
-                     listViewCurrentAlbum,
-                     track);
-    }
 }
 
 void MainWindow::changeTracks(QStringList* trackList,
                               QString artist, QString album)
 {
-    if (artist != listViewCurrentArtist)
-    {
-        QMessageBox::warning(this, "Error",
-                             "<p>TITS (Artist)</p>");
-    }
-    if (album != listViewCurrentAlbum)
-    {
-        QMessageBox::warning(this, "Error",
-                             "<p>TITS (Album)</p>");
-    }
-
     showingTracks = true;
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);

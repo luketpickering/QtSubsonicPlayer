@@ -27,7 +27,10 @@ public:
 
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
+
     int tickInterval;
+    int currentTrackTotalTime;
+    QString currentTrack;
 
     bool showingTracks;
     QString listViewCurrentArtist;
@@ -45,8 +48,6 @@ public:
     MainWindow();
 
 signals:
-    void mediaPlay();
-    void mediaPause();
 
 private:
     void setupMenu();
@@ -55,18 +56,24 @@ private:
 
 public slots:
     void about();
-    void connectToServer();
+    void connectToServer(bool = false);
     void setServerData(QString&, QString&, QString&);
+    void connectToServerFirstRunErr();
 
-    void playPauseClicked();
+    void setTimeLabels(qint64);
     void setTimeElapsedLabel(qint64); 
+    void setTimeRemainingLabel(qint64);
+
+    void stopClicked();
+    void playPauseClicked();
+    void moStateChanged(Phonon::State);
 
     void requestAlbums(QModelIndex);
     void requestTracks(QModelIndex);
     void changeArtists(QStringList*);
     void changeAlbums(QStringList*,QString);
     void changeTracks(QStringList*,QString,QString);
-    void gotTrack(QString,int);
+    void recieveTrack(QString,int);
 };
 
 #endif // MAINWINDOW_H
