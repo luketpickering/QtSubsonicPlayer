@@ -24,6 +24,9 @@ public:
     QString getCacheTrackID(QString _artistName,
                             QString _albumName,
                             QString _trackName);
+	int getCacheTrackLength(QString _artistName,
+                            QString _albumName,
+                            QString _trackName);
 
     bool hardResetCache(QDomDocument* _index);
     bool saveArtist(QDomDocument* _artist, QString _artistName);

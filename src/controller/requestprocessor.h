@@ -17,9 +17,11 @@ public:
 	RequestProcessor(ConnectionData* _cd, QObject* parent);
 	RequestProcessor(QObject* parent);
 
+	void hardResetCache();
 	void getIndex();
 	void getArtist(QString _artistName);
 	void getAlbum(QString _artistName, QString _albumName);
+
 	void getTrack(QString _artistName, QString _albumName,
 		QString _track);
 	void requestPing();
@@ -30,13 +32,17 @@ signals:
 		QString _artistName);
 	void retrievedAlbumListing(QStringList* _alb, 
 		QString _artistName, QString _albumName);
+	/*
 	void retrievedOpenTrackStream(QBuffer* _trackstream,
 		QString _artistName, QString _albumName, QString _track);
+		*/
+	void retrievedTrackData(QString _id, int _seconds);
 
 	void noConnectionData();
 	void pingFailed(int ec);
 	void pingSucceded();
 	void cacheRequiresReset();
+	void cacheIsResetting();
 
 private slots:
 	void hardReset();
@@ -45,8 +51,10 @@ private slots:
 	void responseArtist(QDomDocument* _respXML, QString _artistName);
 	void responseAlbum(QDomDocument* _respXML, QString _artistName, 
 		QString _albumName);
+	/*
 	void responseTrackStream(QBuffer* _buf, QString _artistName, 
 		QString _albumName, QString _track);
+		*/
 	void responsePing();
 
 private:
@@ -54,6 +62,7 @@ private:
 	XMLCacheHandler xch;
 	ConnectionData* connData;
 	bool requestRunning;
+	bool cacheResetting;
 
 	void runRequest();
 	void addToQueue(SubRequest* _toAdd);

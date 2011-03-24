@@ -80,6 +80,18 @@ QString XMLCacheHandler::getCacheTrackID(QString _artistName,
 	return track.attribute("id", "null");
 
 }
+int XMLCacheHandler::getCacheTrackLength(QString _artistName,
+                            QString _albumName,
+                            QString _trackName)
+{
+	QDomElement artist = findArtist(_artistName);
+	QDomElement album = getFirstChildByAttributeValue(artist,
+		"title",_albumName);
+	QDomElement track = getFirstChildByAttributeValue(album,
+		"title", _trackName);
+
+	return track.attribute("duration", "0").toInt();
+}
 
 // ----- END: Cache Requests
 

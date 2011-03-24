@@ -16,6 +16,7 @@
 RequestProcessor::RequestProcessor(ConnectionData* _cd, QObject* parent) : QObject(parent), xch(parent)
 {
 	requestRunning = false;
+	cacheResetting = false;
 	connData = _cd;
 	requestPing();
 	connect(&xch, SIGNAL(requireHardReset()), this, SLOT(hardReset()));
@@ -25,6 +26,24 @@ RequestProcessor::RequestProcessor(ConnectionData* _cd, QObject* parent) : QObje
 void RequestProcessor::hardReset()
 {
 	emit cacheRequiresReset();
+}
+
+void RequestProcessor::hardResetCache()
+{
+	cacheResetting = true;
+
+	int deleteUntil = (requestRunning) ? 1 : 0;
+
+	while(reqList.count() > deleteUntil)
+	{
+		reqList.removeAt(deleteUntil);
+	}
+
+	RetrieveIndex* indReq = new RetrieveIndex(connData,this);
+		connect(indReq,SIGNAL(gotIndex(QDomDocument*)),
+			this, SLOT(responseIndex(QDomDocument*)));
+
+		addToQueue(indReq);
 }
 
 void RequestProcessor::getIndex()
@@ -65,47 +84,53 @@ void RequestProcessor::responseIndex(QDomDocument* _respXML)
 	
 	reqList.removeAt(0);
 	requestRunning = false;
+	cacheResetting = false;
 	runRequest();
 }
 
 void RequestProcessor::getArtist(QString _artistName)
 {
-	QString id = QString();
-	QStringList* artistDir = xch.getCachedArtist(_artistName, &id);
-
-	//this needs to be better - send in a bool rather than this
-	if(artistDir == 0)
+	if(!cacheResetting)
 	{
-		if(id.compare("null") == 0)
-		{
-			std::cout << "cannot find id for Artist directory " <<
-			qPrintable(_artistName) << "\n" << std::endl;
-			//do hard reset
-		}
-		else
-		{
-			RetrieveArtistDir* artDirReq = new RetrieveArtistDir(connData,id
-				,_artistName, this);
-			connect(artDirReq,SIGNAL(gotArtistDir(QDomDocument*, QString)),
-				this, SLOT(responseArtist(QDomDocument*,QString)));
+		QString id = QString();
+		QStringList* artistDir = xch.getCachedArtist(_artistName, &id);
 
-			if(!checkAlreadyQueued(artDirReq))
+		//this needs to be better - send in a bool rather than this
+		if(artistDir == 0)
+		{
+			if(id.compare("null") == 0)
 			{
-				addToQueue(artDirReq);
+				std::cout << "cannot find id for Artist directory " <<
+				qPrintable(_artistName) << "\n" << std::endl;
+				//do hard reset
 			}
 			else
 			{
-				delete artDirReq;
-				std::cout <<  "Request for " << 
-					qPrintable(_artistName) << " already Queued\n" 
-					<< std::endl;
+				RetrieveArtistDir* artDirReq = new RetrieveArtistDir(connData,id
+					,_artistName, this);
+				connect(artDirReq,SIGNAL(gotArtistDir(QDomDocument*, QString)),
+					this, SLOT(responseArtist(QDomDocument*,QString)));
+
+				if(!checkAlreadyQueued(artDirReq))
+				{
+					addToQueue(artDirReq);
+				}
+				else
+				{
+					delete artDirReq;
+					std::cout <<  "Request for " << 
+						qPrintable(_artistName) << " already Queued\n" 
+						<< std::endl;
+				}
 			}
+		}
+		else
+		{	
+			emit retrievedArtistListing(artistDir,_artistName);
 		}
 	}
 	else
-	{	
-		emit retrievedArtistListing(artistDir,_artistName);
-	}
+		emit cacheIsResetting();
 }
 void RequestProcessor::responseArtist(QDomDocument* _respXML, 
 	QString _artistName)
@@ -134,45 +159,50 @@ void RequestProcessor::responseArtist(QDomDocument* _respXML,
 
 void RequestProcessor::getAlbum(QString _artistName, QString _albumName)
 {
-	QString id = QString();
-	QStringList* albumDir = xch.getCachedAlbum(_artistName,
-		_albumName, &id);
-
-	if(albumDir == 0)
+	if(!cacheResetting)
 	{
-		if(id.compare("null") == 0)
-		{
-			std::cout << "cannot find id for album " <<
-			qPrintable(_albumName) << "\n" << std::endl;
-			//do hard reset
-		}
-		else
-		{
-			RetrieveAlbumDir* albDirReq = new RetrieveAlbumDir(connData,id
-				,_artistName, _albumName, this);
+		QString id = QString();
+		QStringList* albumDir = xch.getCachedAlbum(_artistName,
+			_albumName, &id);
 
-			connect(albDirReq,SIGNAL(gotAlbumDir(QDomDocument*,QString,
-				QString)),
-				this, SLOT(responseAlbum(QDomDocument*, QString,
-				QString)));
-
-			if(!checkAlreadyQueued(albDirReq))
+		if(albumDir == 0)
+		{
+			if(id.compare("null") == 0)
 			{
-				addToQueue(albDirReq);
+				std::cout << "cannot find id for album " <<
+				qPrintable(_albumName) << "\n" << std::endl;
+				//do hard reset
 			}
 			else
 			{
-				delete albDirReq;
-				std::cout <<  "Request for " << 
-					qPrintable(_albumName) << " already Queued\n" 
-					<< std::endl;
+				RetrieveAlbumDir* albDirReq = new RetrieveAlbumDir(connData,id
+					,_artistName, _albumName, this);
+
+				connect(albDirReq,SIGNAL(gotAlbumDir(QDomDocument*,QString,
+					QString)),
+					this, SLOT(responseAlbum(QDomDocument*, QString,
+					QString)));
+
+				if(!checkAlreadyQueued(albDirReq))
+				{
+					addToQueue(albDirReq);
+				}
+				else
+				{
+					delete albDirReq;
+					std::cout <<  "Request for " << 
+						qPrintable(_albumName) << " already Queued\n" 
+						<< std::endl;
+				}
 			}
+		}
+		else
+		{	
+				emit retrievedAlbumListing(albumDir,_artistName,_albumName);
 		}
 	}
 	else
-	{	
-            emit retrievedAlbumListing(albumDir,_artistName,_albumName);
-	}
+		emit cacheIsResetting();
 }
 void RequestProcessor::responseAlbum(QDomDocument* _respXML, QString _artistName, 
 	QString _albumName)
@@ -195,21 +225,26 @@ void RequestProcessor::responseAlbum(QDomDocument* _respXML, QString _artistName
 
 void RequestProcessor::requestPing()
 {
-	PingTest* pt = new PingTest(connData, this);
-	connect(pt,SIGNAL(pingResponded()),this,SLOT(responsePing()));
-	connect(pt,SIGNAL(serverPingOk()),this, SIGNAL(pingSucceded()));
-	connect(pt,SIGNAL(serverPingServerError(int)),
-		this, SIGNAL(pingFailed(int)));
-
-	if(!checkAlreadyQueued(pt))
+	if(!cacheResetting)
 	{
-		addToQueue(pt);
+		PingTest* pt = new PingTest(connData, this);
+		connect(pt,SIGNAL(pingResponded()),this,SLOT(responsePing()));
+		connect(pt,SIGNAL(serverPingOk()),this, SIGNAL(pingSucceded()));
+		connect(pt,SIGNAL(serverPingServerError(int)),
+			this, SIGNAL(pingFailed(int)));
+
+		if(!checkAlreadyQueued(pt))
+		{
+			addToQueue(pt);
+		}
+		else
+		{
+			delete pt;
+			std::cout <<  "Request for Ping already Queued\n" << std::endl;
+		}
 	}
 	else
-	{
-		delete pt;
-		std::cout <<  "Request for Ping already Queued\n" << std::endl;
-	}
+		emit cacheIsResetting();
 				
 }
 void RequestProcessor::responsePing()
@@ -223,27 +258,46 @@ void RequestProcessor::responsePing()
 void RequestProcessor::getTrack(QString _artistName, QString _albumName,
 	QString _track)
 {
-	QString id = xch.getCacheTrackID( _artistName, _albumName, _track);
-
-	if(id.compare("null") == 0)
+	if(!cacheResetting)
 	{
-		std::cout << "cannot find id for track " <<
-			qPrintable(_track) << "\n" << std::endl;
-			//do hard reset
+		QString id = xch.getCacheTrackID( _artistName, _albumName, _track);
+		int length = xch.getCacheTrackLength( _artistName, _albumName, _track);
+		emit retrievedTrackData(id, length);
 	}
 	else
+		emit cacheIsResetting();
+}
+
+/*
+void RequestProcessor::getTrack(QString _artistName, QString _albumName,
+	QString _track)
+{
+	if(!cacheResetting)
 	{
-		RetrieveTrackStream* reqRts = 
-			new RetrieveTrackStream(connData, id,
-			 _artistName, _albumName, _track, this); 
+		QString id = xch.getCacheTrackID( _artistName, _albumName, _track);
 
-		connect(reqRts, SIGNAL(gotTrackStream(QBuffer*,
-			QString, QString, QString)),
-			this,SLOT(responseTrackStream(QBuffer*, 
-			QString, QString, QString)));
+		if(id.compare("null") == 0)
+		{
+			std::cout << "cannot find id for track " <<
+				qPrintable(_track) << "\n" << std::endl;
+				//do hard reset
+		}
+		else
+		{
+			RetrieveTrackStream* reqRts = 
+				new RetrieveTrackStream(connData, id,
+				 _artistName, _albumName, _track, this); 
 
-		addToQueue(reqRts);
+			connect(reqRts, SIGNAL(gotTrackStream(QBuffer*,
+				QString, QString, QString)),
+				this,SLOT(responseTrackStream(QBuffer*, 
+				QString, QString, QString)));
+
+			addToQueue(reqRts);
+		}
 	}
+	else
+		emit cacheIsResetting();
 }
 void RequestProcessor::responseTrackStream(QBuffer* _buf, 
 	QString _artistName, QString _albumName, QString _track)
@@ -254,6 +308,11 @@ void RequestProcessor::responseTrackStream(QBuffer* _buf,
 	requestRunning = false;
 	runRequest();
 }
+*/
+
+
+
+
 
 void RequestProcessor::addToQueue(SubRequest* _toAdd)
 {
