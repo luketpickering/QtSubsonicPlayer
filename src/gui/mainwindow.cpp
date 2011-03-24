@@ -108,8 +108,8 @@ void MainWindow::setMediaConnections()
             this, SLOT(setTimeElapsedLabel(qint64)));
 
     // connect
-    connect(rp, SIGNAL(retrievedOpenTrackStream(QBuffer*,QString,QString,QString)),
-            mediaPlayer, SLOT(gotTrack(QBuffer*, QString, QString, QString)));
+    connect(rp, SIGNAL(retrievedTrackData(QString,int)),
+            mediaPlayer, SLOT(gotTrack(QString,int)));
 
 
     connect(mediaPlayer, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
