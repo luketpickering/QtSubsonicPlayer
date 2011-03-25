@@ -9,6 +9,8 @@ class XMLCacheHandler: public QObject
 {
     Q_OBJECT
 
+    //----- TODO ----- have the getCachedIndex use bools rather than setting the pointer to zero
+
 public:
     //----- Constructors
     XMLCacheHandler(QObject* parent);
@@ -42,7 +44,6 @@ signals:
 
     // Signals for external slots
     void requireHardReset();
-    void cacheReset();
 
 private:
     //----- Members

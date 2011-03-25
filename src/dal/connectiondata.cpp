@@ -17,7 +17,17 @@ ConnectionData::ConnectionData(QString _host, QString _usr,
     usr = _usr;
     pss = _pss;
     port = _port;
-	gotServerIP = false;
+    gotServerIP = false;
 }
 
 // END: Constructors **********************************************************
+
+
+void ConnectionData::changeDetails(QString _host, QString _usr, QString _pss, int _port)
+{
+    host = _host;
+    usr = _usr;
+    pss = _pss;
+    port = _port;
+    gotServerIP = false;
+}

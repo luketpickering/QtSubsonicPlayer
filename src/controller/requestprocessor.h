@@ -12,7 +12,20 @@ class RequestProcessor : public QObject
 	Q_OBJECT
 public:
 
+    //TODO_____________________________________________________________
+
 	//make it so that save is not every cache response.
+
+        //MAKE IT SO::: if a request tries to be re-added it bumps that request
+        //to the top of the queue and sets its bump count to zero
+
+        //have a function to check if serverside directory has been changed
+        //since caches began
+
+        //need to be able to check the response for a bad directory response
+
+        //investigate searching the cache just prior to the request going out
+    //_________________________________________________________________
 
 	RequestProcessor(ConnectionData* _cd, QObject* parent);
 	RequestProcessor(QObject* parent);
@@ -36,17 +49,21 @@ signals:
 	void retrievedOpenTrackStream(QBuffer* _trackstream,
 		QString _artistName, QString _albumName, QString _track);
 		*/
+
 	void retrievedTrackData(QString _id, int _seconds);
 
 	void noConnectionData();
+
 	void pingFailed(int ec);
 	void pingSucceded();
+
 	void cacheRequiresReset();
 	void cacheIsResetting();
 	void cacheReset();
+        void cacheResetFailed();
 
 private slots:
-	void hardReset();
+        //void hardReset();
 
 	void responseIndex(QDomDocument* _respXML);
 	void responseArtist(QDomDocument* _respXML, QString _artistName);

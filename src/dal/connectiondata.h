@@ -8,14 +8,22 @@ class QString;
   Holds the connection data for all server requests
 */
 
+//make modifications go via methods
+
 class ConnectionData
 {
 public:
 	ConnectionData();
-	ConnectionData(QString host,
-                       QString usr,
-                       QString pss,
-                       int port);
+        ConnectionData(QString _host,
+                       QString _usr,
+                       QString _pss,
+                       int _port);
+
+        void changeDetails(QString _host,
+                      QString _usr,
+                      QString _pss,
+                      int _port);
+
 	QString host;
 	QString usr;
 	QString pss;

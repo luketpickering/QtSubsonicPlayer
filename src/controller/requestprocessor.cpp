@@ -18,14 +18,8 @@ RequestProcessor::RequestProcessor(ConnectionData* _cd, QObject* parent) : QObje
 	requestRunning = false;
 	cacheResetting = false;
 	connData = _cd;
-	requestPing();
-	connect(&xch, SIGNAL(requireHardReset()), this, SLOT(hardReset()));
+        connect(&xch, SIGNAL(requireHardReset()), this, SIGNAL(cacheRequiresReset()));
 	xch.loadCacheFromDisk();
-}
-
-void RequestProcessor::hardReset()
-{
-	emit cacheRequiresReset();
 }
 
 void RequestProcessor::hardResetCache()
@@ -43,7 +37,7 @@ void RequestProcessor::hardResetCache()
 		connect(indReq,SIGNAL(gotIndex(QDomDocument*)),
 			this, SLOT(responseIndex(QDomDocument*)));
 
-		addToQueue(indReq);
+        addToQueue(indReq);
 }
 
 void RequestProcessor::getIndex()
@@ -52,19 +46,7 @@ void RequestProcessor::getIndex()
 
 	if(index == 0)
 	{
-		RetrieveIndex* indReq = new RetrieveIndex(connData,this);
-		connect(indReq,SIGNAL(gotIndex(QDomDocument*)),
-			this, SLOT(responseIndex(QDomDocument*)));
-
-		if(!checkAlreadyQueued(indReq))
-		{
-			addToQueue(indReq);
-		}
-		else
-		{
-			delete indReq;
-			std::cout << "Index Request already Queued\n" << std::endl;
-		}
+                hardResetCache();
 	}
 	else
 	{	
@@ -74,22 +56,29 @@ void RequestProcessor::getIndex()
 void RequestProcessor::responseIndex(QDomDocument* _respXML)
 {
 	sender()->deleteLater();
-	xch.hardResetCache(_respXML);
+        bool saved = xch.hardResetCache(_respXML);
 
-	if(((SubRequest*)sender())->checkBumps() == 0 )
-	{
-		QStringList* index = xch.getCachedIndex();
-		emit retrievedIndex(index);
-	}
-	
+
+        QStringList* index = xch.getCachedIndex();
+        emit retrievedIndex(index);
+
 	reqList.removeAt(0);
 
-	if(cacheResetting)
+
+        cacheResetting = false;
+
+        if(saved)
         {
-		cacheResetting = false;
-                emit cacheReset();
-                std::cout << "cache reset" << std::endl;
-	}
+            emit cacheReset();
+            std::cout << "cache reset" << std::endl;
+        }
+        else
+        {
+            emit cacheResetFailed();
+            std::cout << "new cache couldn't be saved properly" << std::endl;
+        }
+
+
 
 	requestRunning = false;
 	runRequest();
