@@ -33,6 +33,14 @@ MainWindow::MainWindow()
     cd = new ConnectionData();
     rp = new RequestProcessor(cd, this);
     setupRequests();
+
+    QMessageBox::warning(this, "Due Notice!",
+                         "<p> This is still a very early version of this "
+                         "application and it does not work perfectly. If you are "
+                         "having any trouble getting the artists up, you have probably "
+                         "input incorrect server data so restart the application "
+                         "and try again.</p>"
+                         "<p> Enjoy! </p>");
 }
 
 
@@ -107,6 +115,15 @@ void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, int
     cd->gotServerIP = false;
 
     rp->requestPing();
+}
+
+void MainWindow::serverError()
+{
+    QMessageBox::warning(this, "Server Error",
+                         "<p>You have input incorrect server details. This is"
+                         "still a very rough application and unfortunately,"
+                         "to try again you will have to quit and reopen the"
+                         "application. Better luck next time!</p>");
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -362,14 +379,14 @@ void MainWindow::setupRequests()
     connect(rp, SIGNAL(retrievedAlbumListing(QList< QPair<QString,QString> >*,QString,QString)),
             this, SLOT(changeTracks(QList< QPair<QString,QString> >*,QString,QString)));
 
-    connect(rp, SIGNAL(retrievedTrackData(QString,int)),
-            this, SLOT(recieveTrack(QString,int)));
-
     connect(rp,SIGNAL(cacheReset()),
             this, SLOT(getIndex()));
 
     connect(rp, SIGNAL(pingSucceded()),
             this, SLOT(resetCache()));
+
+    connect(rp, SIGNAL(pingFailed(int)),
+            this, SLOT(serverError()));
 }
 
 void MainWindow::resetCache()

@@ -65,6 +65,7 @@ public slots:
     void about();
     void connectToServer();
     void setServerData(QString&,QString&,QString&,int&);
+    void serverError();
 
     void setTimeLabels(qint64);
     void setTimeElapsedLabel(qint64); 
