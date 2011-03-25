@@ -70,6 +70,7 @@ void MainWindow::about()
         "<p> Graphical front-end for the subsonic music server. </p>"
         "<p> By <a href=http://mnielsen.org.uk>Michael Nielsen</a> "
         "and <a href=http://ursaminorbeta.org.uk>Luke Pickering</a>. </p>"));
+
 }
 
 // END: Menu Related Methods and Slots ****************************************
@@ -86,8 +87,8 @@ void MainWindow::connectToServer()
     ConnectToServerDialog *connectToServerDialog = new ConnectToServerDialog(this);
 
     connect(connectToServerDialog,
-            SIGNAL(serverDetailsEntered(QString&,QString&,QString&,QString&)),
-            this, SLOT(setServerData(QString&,QString&,QString&,QString&)));
+            SIGNAL(serverDetailsEntered(QString&,QString&,QString&,int&)),
+            this, SLOT(setServerData(QString&,QString&,QString&,int&)));
 
     connectToServerDialog->exec();
 }
@@ -97,14 +98,12 @@ void MainWindow::connectToServer()
   server, username and password from the values input by the user
   in the ConnectToServerDialog
 */
-void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, QString& _port)
+void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, int& _port)
 {
-    std::cout << "gay" << std::endl;
-    cd->changeDetails(_host, _usr, _pss, _port.toInt());
+    cd->changeDetails(_host, _usr, _pss, _port);
     cd->gotServerIP = false;
 
     rp->requestPing();
-    rp->hardResetCache();
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -146,8 +145,6 @@ void MainWindow::recieveTrack(QString _id, int _length)
              + "/rest/stream.view?u=" + cd->usr
              + "&p=" + cd->pss + "&v=1.5.0" + "&c=QtSubsonicPlayer"
              + "&id=" + _id);
-
-    std::cout << qPrintable(url.toString()) << std::endl;
 
     Phonon::MediaSource mediaSource(url);
     mediaObject->setCurrentSource(mediaSource);
@@ -276,12 +273,20 @@ void MainWindow::setupRequests()
             this, SLOT(recieveTrack(QString,int)));
 
     connect(rp,SIGNAL(cacheReset()), this, SLOT(getIndex()));
+
+    connect(rp, SIGNAL(pingSucceded()), this, SLOT(resetCache()));
+}
+
+void MainWindow::resetCache()
+{
+    rp->hardResetCache();
 }
 
 void MainWindow::getIndex()
 {
     rp->getIndex();
 }
+
 
 void MainWindow::changeArtists(QStringList* artistList)
 {

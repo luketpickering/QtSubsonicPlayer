@@ -14,7 +14,7 @@ public:
     QString host;
     QString usr;
     QString pss;
-    QString port;
+    int port;
 
     ConnectToServerDialog(QWidget *parent = 0);
 
@@ -22,7 +22,7 @@ private slots:
     void serverData();
 
 signals:
-    void serverDetailsEntered(QString&,QString&,QString&,QString&);
+    void serverDetailsEntered(QString&,QString&,QString&,int&);
 };
 
 #endif // CONNECTTOSERVERDIALOG_H

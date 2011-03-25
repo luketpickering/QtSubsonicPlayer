@@ -17,8 +17,19 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
 */
 void ConnectToServerDialog::serverData()
 {
+    if (portLineEdit->text().length() > 0)
+        port = portLineEdit->text().toInt();
+    else
+        port = -1;
+
     host = pathLineEdit->text();
-    port = portLineEdit->text();
+    host.remove("http://");
+
+    QStringList host_port = host.split(':');
+    host = host_port.at(0);
+    if (host_port.length() == 2)
+        port = host_port.at(1).toInt();
+
     usr = usernameLineEdit->text();
     pss = passwordLineEdit->text();
 

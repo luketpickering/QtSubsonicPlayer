@@ -53,7 +53,7 @@ private:
 public slots:
     void about();
     void connectToServer();
-    void setServerData(QString&,QString&,QString&,QString&);
+    void setServerData(QString&,QString&,QString&,int&);
 
     void setTimeLabels(qint64);
     void setTimeElapsedLabel(qint64); 
@@ -64,6 +64,7 @@ public slots:
     void previousClicked();
     void moStateChanged(Phonon::State);
 
+    void resetCache();
     void getIndex();
     void requestAlbums(QModelIndex);
     void requestTracks(QModelIndex);
