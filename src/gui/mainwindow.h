@@ -33,7 +33,10 @@ public:
 
     int tickInterval;
     int currentTrackTotalTime;
+
+    QString currentArtist;
     QString currentTrack;
+    int currentIndex;
 
     bool showingTracks;
 
@@ -52,7 +55,7 @@ private:
     void setupMenu();
     void setupMedia();
     void setupRequests();
-    int searchCurrentTrackPairList(QString);
+    int searchCurrentTrackPairList(QString,int);
     QUrl *getUrl(QString);
 
 signals:
@@ -70,7 +73,9 @@ public slots:
     void stopClicked();
     void playPauseClicked();
     void previousClicked();
+    void nextClicked();
     void moStateChanged(Phonon::State);
+    void trackChanged(Phonon::MediaSource);
 
     void resetCache();
     void getIndex();

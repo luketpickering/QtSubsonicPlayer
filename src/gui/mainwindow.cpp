@@ -132,6 +132,12 @@ void MainWindow::setupMedia()
     connect(stopButton, SIGNAL(clicked()),
             this, SLOT(stopClicked()));
 
+    connect(previousButton, SIGNAL(clicked()),
+            this, SLOT(previousClicked()));
+
+    connect(nextButton, SIGNAL(clicked()),
+            this, SLOT(nextClicked()));
+
     // set up time labels
     connect(mediaObject, SIGNAL(tick(qint64)),
             this, SLOT(setTimeLabels(qint64)));
@@ -139,16 +145,23 @@ void MainWindow::setupMedia()
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
             this, SLOT(moStateChanged(Phonon::State)));
 
-    connect(previousButton, SIGNAL(clicked()),
-            this, SLOT(previousClicked()));
+
+    connect(mediaObject, SIGNAL(currentSourceChanged(Phonon::MediaSource)),
+            this, SLOT(trackChanged(Phonon::MediaSource)));
 
     connect(this, SIGNAL(setTrack(QString)),
             this, SLOT(playTrack(QString)));
 }
 
+/*
+  slot which takes a given track name for the current artist, plays the track
+  and sets up the mediaObject queue for sequential playback
+*/
 void MainWindow::playTrack(QString trackName)
 {
-    int currentTrackIndex = searchCurrentTrackPairList(trackName);
+    currentArtist = listViewCurrentArtist;
+
+    int currentTrackIndex = searchCurrentTrackPairList(trackName,0);
 
     Phonon::MediaSource
             mediaSource(*getUrl(currentTrackPairList->at(currentTrackIndex).second));
@@ -163,14 +176,32 @@ void MainWindow::playTrack(QString trackName)
 
     mediaObject->setQueue(queueList);
 
-    // for some reason the track will only play immediately is played, paused
-    // and then played again.
+    // for some reason (encoding?) some tracks will only play immediately is played,
+    // paused and then played again... twice.
+    mediaObject->play();
+    mediaObject->pause();
     mediaObject->play();
     mediaObject->pause();
     mediaObject->play();
 }
 
+void MainWindow::trackChanged(Phonon::MediaSource newSource)
+{
+    QString trackUrl = newSource.url().toString();
+    QStringList parts = trackUrl.split('&');
+    QString id = parts.at(4);
+    id.remove(0,3);
 
+    currentIndex = searchCurrentTrackPairList(id,1);
+    currentTrack = currentTrackPairList->at(currentIndex).first;
+
+    setWindowTitle(currentArtist + " - " + currentTrack);
+}
+
+/*
+  private method which returns the required QUrl to get the mediaSource for a given
+  track id
+*/
 QUrl *MainWindow::getUrl(QString Id)
 {
     QUrl *url = new QUrl("http://" + cd->host + ":" + QString::number(cd->port)
@@ -181,14 +212,25 @@ QUrl *MainWindow::getUrl(QString Id)
     return url;
 }
 
-int MainWindow::searchCurrentTrackPairList(QString trackName)
+/*
+  private method returns the (int) index of the currentTrackPairList at which the
+  value appears, takes an argument nameOrId for whether to search for a
+  track name (0) or an id (1)
+*/
+int MainWindow::searchCurrentTrackPairList(QString value, int nameOrId)
 {
     int index = 0;
 
     for (int i = currentTrackPairList->size() - 1; i >= 0; --i)
     {
-        if (currentTrackPairList->at(i).first == trackName)
-            index = i;
+        if (nameOrId == 0){
+            if (currentTrackPairList->at(i).first == value)
+                index = i;
+        }
+        else if (nameOrId == 1){
+            if (currentTrackPairList->at(i).second == value)
+                index = i;
+        }
     }
 
     return index;
@@ -221,7 +263,26 @@ void MainWindow::stopClicked()
 
 void MainWindow::previousClicked()
 {
-    mediaObject->seek(0);
+    if (mediaObject->currentTime() > 2000)
+    {
+        mediaObject->seek(0);
+    }
+    else if (currentIndex < currentTrackPairList->size() - 1)
+    {
+        QString previousTrack;
+        previousTrack = currentTrackPairList->at(currentIndex+1).first;
+        playTrack(previousTrack);
+    }
+}
+
+void MainWindow::nextClicked()
+{
+    if (currentIndex > 0)
+    {
+        QString nextTrack;
+        nextTrack = currentTrackPairList->at(currentIndex-1).first;
+        playTrack(nextTrack);
+    }
 }
 
 void MainWindow::moStateChanged(Phonon::State state)
@@ -232,6 +293,7 @@ void MainWindow::moStateChanged(Phonon::State state)
         playPauseButton->setChecked(true);
     }
 }
+
 
 void MainWindow::setTimeLabels(qint64 _time)
 {
@@ -372,20 +434,7 @@ void MainWindow::requestTracks(QModelIndex _index)
 
         QString track;
         track = trackListModel->data(_index, 2).toString();
-        if (track == "Play all...")
-        {
-            currentTrack
-                = trackListModel
-                    ->data(_index.sibling(_index.row() + 2, 0), 2).toString();
-        }
-        else if (track == " ")
-        {
-            // Do nothing
-        }
-        else
-        {
-            currentTrack = track;
-        }
+        currentTrack = track;
 
         emit setTrack(currentTrack);
     }
@@ -413,8 +462,6 @@ void MainWindow::changeTracks(QList< QPair<QString,QString> >* trackPairList,
 
     showingTracks = true;
     albumTracksLabel->setText("Tracks");
-    trackList->insert(0, " ");
-    trackList->insert(0, "Play all...");
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
     albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
