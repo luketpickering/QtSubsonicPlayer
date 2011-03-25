@@ -159,8 +159,6 @@ void MainWindow::setupMedia()
 */
 void MainWindow::playTrack(QString trackName)
 {
-    currentArtist = listViewCurrentArtist;
-
     int currentTrackIndex = searchCurrentTrackPairList(trackName,0);
 
     Phonon::MediaSource
@@ -436,6 +434,7 @@ void MainWindow::requestTracks(QModelIndex _index)
         track = trackListModel->data(_index, 2).toString();
         currentTrack = track;
 
+        currentArtist = listViewCurrentArtist;
         emit setTrack(currentTrack);
     }
     else
