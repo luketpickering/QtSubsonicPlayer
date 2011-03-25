@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtXml/qdom.h>
 #include <QBuffer>
+#include <QMap>
 
 class XMLCacheHandler: public QObject
 {
@@ -26,9 +27,13 @@ public:
     QString getCacheTrackID(QString _artistName,
                             QString _albumName,
                             QString _trackName);
-	int getCacheTrackLength(QString _artistName,
+    int getCacheTrackLength(QString _artistName,
                             QString _albumName,
                             QString _trackName);
+
+    QMap<QString,QString>* getCachedWholeAlbum(QString _artistName,
+                                             QString _albumName,
+                                              QString* _id);
 
     bool hardResetCache(QDomDocument* _index);
     bool saveArtist(QDomDocument* _artist, QString _artistName);

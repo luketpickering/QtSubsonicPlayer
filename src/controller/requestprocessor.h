@@ -5,6 +5,7 @@
 #include "xmlcachehandler.h"
 #include "../dal/connectiondata.h"
 #include "../dal/subrequest.h"
+#include <QMap>
 
 
 class RequestProcessor : public QObject
@@ -43,9 +44,14 @@ signals:
 	void retrievedIndex(QStringList* _index);
 	void retrievedArtistListing(QStringList* _art,
 		QString _artistName);
+
+        void retrievedAlbumListing(QMap<QString,QString>* _alb,
+                QString _artistName, QString _albumName);
+
+        /*
 	void retrievedAlbumListing(QStringList* _alb, 
 		QString _artistName, QString _albumName);
-	/*
+
 	void retrievedOpenTrackStream(QBuffer* _trackstream,
 		QString _artistName, QString _albumName, QString _track);
 		*/

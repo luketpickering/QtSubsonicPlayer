@@ -93,6 +93,32 @@ int XMLCacheHandler::getCacheTrackLength(QString _artistName,
 	return track.attribute("duration", "0").toInt();
 }
 
+QMap<QString,QString>* XMLCacheHandler::getCachedWholeAlbum(QString _artistName,
+                                         QString _albumName,
+                                         QString* _id)
+{
+    QDomElement artist = findArtist(_artistName);
+    QDomElement album = getFirstChildByAttributeValue(artist,
+            "title",_albumName);
+
+    QDomNodeList qnl =  album.elementsByTagName("track");
+    QMap<QString,QString>* rtnMap = new QMap<QString,QString>();
+
+    if(qnl.length() > 0)
+    {
+        for(uint ctr = 0; ctr < qnl.length(); ++ctr )
+        {
+            rtnMap->insert(qnl.at(ctr).toElement().attribute("title","null"),qnl.at(ctr).toElement().attribute("id","null"));
+        }
+        return rtnMap;
+    }
+    else
+    {
+        *_id = album.attribute("id","null");
+        return 0;
+    }
+}
+
 // ----- END: Cache Requests
 
 // ----- BEGIN: Save to Cache
