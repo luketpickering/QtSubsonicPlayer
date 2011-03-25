@@ -28,9 +28,8 @@ MainWindow::MainWindow()
 
     showingTracks = false;
 
-    cd = new ConnectionData(" ", " ", " ", 0);
+    cd = new ConnectionData();
     rp = new RequestProcessor(cd, this);
-    connectToServer();
     setupRequests();
 }
 
@@ -101,12 +100,10 @@ void MainWindow::connectToServer()
 void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, QString& _port)
 {
     std::cout << "gay" << std::endl;
-    cd->host = _host;
-    cd->usr = _usr;
-    cd->pss = _pss;
-    cd->port = -1;
+    cd->changeDetails(_host, _usr, _pss, _port.toInt());
     cd->gotServerIP = false;
 
+    rp->requestPing();
     rp->hardResetCache();
 }
 
@@ -145,9 +142,12 @@ void MainWindow::setupMedia()
 
 void MainWindow::recieveTrack(QString _id, int _length)
 {
-    QUrl url("http://" + cd->host + "/rest/stream.view?u=" + cd->usr
+    QUrl url("http://" + cd->host + ":" + QString::number(cd->port)
+             + "/rest/stream.view?u=" + cd->usr
              + "&p=" + cd->pss + "&v=1.5.0" + "&c=QtSubsonicPlayer"
              + "&id=" + _id);
+
+    std::cout << qPrintable(url.toString()) << std::endl;
 
     Phonon::MediaSource mediaSource(url);
     mediaObject->setCurrentSource(mediaSource);
