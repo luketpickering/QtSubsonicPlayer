@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QList>
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
@@ -77,6 +78,7 @@ void MainWindow::about()
 
 
 
+
 // BEGIN: ConnectToServerDialog Related Methods and Sots **********************
 
 /*
@@ -107,6 +109,7 @@ void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, int
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
+
 
 
 
@@ -250,7 +253,7 @@ void MainWindow::setTimeRemainingLabel(qint64 currentTime_ms)
 
 
 
-// BEGIN: ListView Population Methods and Slots *******************************
+// BEGIN: ListView Population and Requests Methods and Slots ******************
 
 void MainWindow::setupRequests()
 {
@@ -310,8 +313,6 @@ void MainWindow::requestAlbums(QModelIndex _index)
 
     listViewCurrentArtist = artistListModel->data(_index, 2).toString();
     rp->getArtist(listViewCurrentArtist);
-
-    showingTracks = false;
 }
 
 
@@ -322,6 +323,7 @@ void MainWindow::changeAlbums(QStringList* albumList, QString artist)
 
     albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    albumTracksLabel->setText("Albums");
     showingTracks = false;
     delete albumList;
 }
@@ -338,11 +340,24 @@ void MainWindow::requestTracks(QModelIndex _index)
 
         QString track;
         track = trackListModel->data(_index, 2).toString();
-        currentTrack = track;
+        if (track == "Play all...")
+        {
+            currentTrack
+                = trackListModel
+                    ->data(_index.sibling(_index.row() + 2, 0), 2).toString();
+        }
+        else if (track == " ")
+        {
+            // Do nothing
+        }
+        else
+        {
+            currentTrack = track;
+        }
 
         rp->getTrack(listViewCurrentArtist,
                      listViewCurrentAlbum,
-                     track);
+                     currentTrack);
     }
     else
     {
@@ -351,8 +366,7 @@ void MainWindow::requestTracks(QModelIndex _index)
         albumTracksListView->setSelectionMode(QAbstractItemView::NoSelection);
 
         listViewCurrentAlbum = albumListModel->data(_index, 2).toString();
-        rp->getAlbum(listViewCurrentArtist,
-                     listViewCurrentAlbum);
+        rp->getAlbum(listViewCurrentArtist, listViewCurrentAlbum);
     }
 }
 
@@ -360,9 +374,11 @@ void MainWindow::changeTracks(QStringList* trackList,
                               QString artist, QString album)
 {
     showingTracks = true;
+    albumTracksLabel->setText("Tracks");
+    trackList->insert(0, " ");
+    trackList->insert(0, "Play all...");
     trackListModel = new QStringListModel(*trackList, this);
     albumTracksListView->setModel(trackListModel);
     albumTracksListView->setSelectionMode(QAbstractItemView::SingleSelection);
     delete trackList;
 }
-
