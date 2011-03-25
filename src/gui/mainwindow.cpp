@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QList>
+#include <QPair>
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
@@ -140,28 +141,57 @@ void MainWindow::setupMedia()
 
     connect(previousButton, SIGNAL(clicked()),
             this, SLOT(previousClicked()));
+
+    connect(this, SIGNAL(setTrack(QString)),
+            this, SLOT(playTrack(QString)));
 }
 
-void MainWindow::recieveTrack(QString _id, int _length)
+void MainWindow::playTrack(QString trackName)
 {
-    QUrl url("http://" + cd->host + ":" + QString::number(cd->port)
-             + "/rest/stream.view?u=" + cd->usr
-             + "&p=" + cd->pss + "&v=1.5.0" + "&c=QtSubsonicPlayer"
-             + "&id=" + _id);
+    int currentTrackIndex = searchCurrentTrackPairList(trackName);
 
-    Phonon::MediaSource mediaSource(url);
+    Phonon::MediaSource
+            mediaSource(*getUrl(currentTrackPairList->at(currentTrackIndex).second));
+
     mediaObject->setCurrentSource(mediaSource);
 
-    currentTrackTotalTime = _length;
+    QList<QUrl> queueList;
+    for (int i = currentTrackIndex -1; i >= 0; --i)
+    {
+        queueList.append(*getUrl(currentTrackPairList->at(i).second));
+    }
 
-    this->setWindowTitle("QtSubsonicPlayer: " + listViewCurrentArtist
-                         + " - " + currentTrack);
+    mediaObject->setQueue(queueList);
 
     // for some reason the track will only play immediately is played, paused
     // and then played again.
     mediaObject->play();
     mediaObject->pause();
     mediaObject->play();
+}
+
+
+QUrl *MainWindow::getUrl(QString Id)
+{
+    QUrl *url = new QUrl("http://" + cd->host + ":" + QString::number(cd->port)
+                         + "/rest/stream.view?u=" + cd->usr
+                         + "&p=" + cd->pss + "&v=1.5.0" + "&c=QtSubsonicPlayer"
+                         + "&id=" + Id);
+
+    return url;
+}
+
+int MainWindow::searchCurrentTrackPairList(QString trackName)
+{
+    int index = 0;
+
+    for (int i = currentTrackPairList->size() - 1; i >= 0; --i)
+    {
+        if (currentTrackPairList->at(i).first == trackName)
+            index = i;
+    }
+
+    return index;
 }
 
 void MainWindow::playPauseClicked()
@@ -269,15 +299,17 @@ void MainWindow::setupRequests()
     connect(albumTracksListView, SIGNAL(doubleClicked(QModelIndex)),
             this, SLOT(requestTracks(QModelIndex)));
 
-    connect(rp, SIGNAL(retrievedAlbumListing(QStringList*,QString,QString)),
-            this, SLOT(changeTracks(QStringList*,QString,QString)));
+    connect(rp, SIGNAL(retrievedAlbumListing(QList< QPair<QString,QString> >*,QString,QString)),
+            this, SLOT(changeTracks(QList< QPair<QString,QString> >*,QString,QString)));
 
     connect(rp, SIGNAL(retrievedTrackData(QString,int)),
             this, SLOT(recieveTrack(QString,int)));
 
-    connect(rp,SIGNAL(cacheReset()), this, SLOT(getIndex()));
+    connect(rp,SIGNAL(cacheReset()),
+            this, SLOT(getIndex()));
 
-    connect(rp, SIGNAL(pingSucceded()), this, SLOT(resetCache()));
+    connect(rp, SIGNAL(pingSucceded()),
+            this, SLOT(resetCache()));
 }
 
 void MainWindow::resetCache()
@@ -355,9 +387,7 @@ void MainWindow::requestTracks(QModelIndex _index)
             currentTrack = track;
         }
 
-        rp->getTrack(listViewCurrentArtist,
-                     listViewCurrentAlbum,
-                     currentTrack);
+        emit setTrack(currentTrack);
     }
     else
     {
@@ -370,9 +400,17 @@ void MainWindow::requestTracks(QModelIndex _index)
     }
 }
 
-void MainWindow::changeTracks(QStringList* trackList,
+void MainWindow::changeTracks(QList< QPair<QString,QString> >* trackPairList,
                               QString artist, QString album)
 {
+    currentTrackPairList = trackPairList;
+
+    QStringList *trackList = new QStringList();
+    for (int i = trackPairList->size() -1; i >= 0; --i)
+    {
+        trackList->append(trackPairList->at(i).first);
+    }
+
     showingTracks = true;
     albumTracksLabel->setText("Tracks");
     trackList->insert(0, " ");
