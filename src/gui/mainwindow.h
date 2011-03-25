@@ -59,6 +59,7 @@ public slots:
     void connectToServer(bool = false);
     void setServerData(QString&, QString&, QString&);
     void connectToServerFirstRunErr();
+    void connectToServerCancelClicked();
 
     void setTimeLabels(qint64);
     void setTimeElapsedLabel(qint64); 
@@ -66,8 +67,10 @@ public slots:
 
     void stopClicked();
     void playPauseClicked();
+    void previousClicked();
     void moStateChanged(Phonon::State);
 
+    void getIndex();
     void requestAlbums(QModelIndex);
     void requestTracks(QModelIndex);
     void changeArtists(QStringList*);

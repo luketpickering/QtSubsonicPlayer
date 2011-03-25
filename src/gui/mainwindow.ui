@@ -14,8 +14,8 @@
    <string>Subsonic Player</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/Application Icons/subsonic-icon.png</normaloff>:/Application Icons/subsonic-icon.png</iconset>
+   <iconset resource="../../resources/Icons.qrc">
+    <normaloff>:/applicationicons/subsonic-icon.png</normaloff>:/applicationicons/subsonic-icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">

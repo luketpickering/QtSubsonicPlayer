@@ -24,16 +24,12 @@ MainWindow::MainWindow()
     audioOutput = new Phonon::AudioOutput(this);
     Phonon::createPath(mediaObject, audioOutput);
     tickInterval = 1000;
-
     setupMedia();
 
     showingTracks = false;
 
     connectToServer(true);
-
     setupRequests();
-
-    rp->getIndex();
 }
 
 
@@ -96,6 +92,9 @@ void MainWindow::connectToServer(bool firstRun)
         delete rp;
 
         disconnect(this, SLOT(connectToServerFirstRunErr()));
+        disconnect(this, SLOT(connectToServerCancelClicked()));
+        connect(connectToServerDialog, SIGNAL(rejected()),
+                this, SLOT(connectToServerCancelClicked()));
     }
     else
     {
@@ -127,6 +126,10 @@ void MainWindow::setServerData(QString &_srvr,
 
     cd = new ConnectionData(serverpath, username, password,-1);
     rp = new RequestProcessor(cd, this);
+    artistListView->setModel(&QStringListModel(QStringList(" ")));
+    albumTracksListView->setModel(&QStringListModel(QStringList(" ")));
+    rp->hardResetCache();
+    rp->getIndex();
 }
 
 void MainWindow::connectToServerFirstRunErr()
@@ -135,6 +138,13 @@ void MainWindow::connectToServerFirstRunErr()
                          "<p>You must enter server details.</p>");
 
     connectToServer(true);
+}
+
+void MainWindow::connectToServerCancelClicked()
+{
+    cd = new ConnectionData(serverpath, username, password,-1);
+    rp = new RequestProcessor(cd, this);
+    rp->getIndex();
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -165,6 +175,9 @@ void MainWindow::setupMedia()
 
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
             this, SLOT(moStateChanged(Phonon::State)));
+
+    connect(previousButton, SIGNAL(clicked()),
+            this, SLOT(previousClicked()));
 }
 
 void MainWindow::recieveTrack(QString _id, int _length)
@@ -211,6 +224,11 @@ void MainWindow::stopClicked()
     }
 
     mediaObject->stop();
+}
+
+void MainWindow::previousClicked()
+{
+    mediaObject->seek(0);
 }
 
 void MainWindow::moStateChanged(Phonon::State state)
@@ -293,8 +311,14 @@ void MainWindow::setupRequests()
 
     connect(rp, SIGNAL(retrievedTrackData(QString,int)),
             this, SLOT(recieveTrack(QString,int)));
+
+    connect(rp,SIGNAL(cacheIsResetting()), this, SLOT(getIndex()));
 }
 
+void MainWindow::getIndex()
+{
+    rp->getIndex();
+}
 
 void MainWindow::changeArtists(QStringList* artistList)
 {
