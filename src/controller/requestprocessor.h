@@ -45,7 +45,7 @@ signals:
 	void retrievedArtistListing(QStringList* _art,
 		QString _artistName);
 
-        void retrievedAlbumListing(QMap<QString,QString>* _alb,
+        void retrievedAlbumListing(QList< QPair<QString,QString> >* _alb,
                 QString _artistName, QString _albumName);
 
         /*

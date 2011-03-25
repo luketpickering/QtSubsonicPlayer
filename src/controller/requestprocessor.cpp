@@ -166,7 +166,7 @@ void RequestProcessor::getAlbum(QString _artistName, QString _albumName)
                                                    _albumName, &id);
         /* */
 
-        QMap<QString,QString>* albumDir = xch.getCachedWholeAlbum(_artistName,_albumName,&id);
+       QList< QPair<QString,QString> >* albumDir = xch.getCachedWholeAlbum(_artistName,_albumName,&id);
 
         if(albumDir == 0)
         {
@@ -223,7 +223,7 @@ void RequestProcessor::responseAlbum(QDomDocument* _respXML, QString _artistName
                                                    _albumName,&id);
         /*   */
 
-        QMap<QString,QString>* albumDir = xch.getCachedWholeAlbum(_artistName,_albumName,&id);
+        QList< QPair<QString,QString> >* albumDir = xch.getCachedWholeAlbum(_artistName,_albumName,&id);
         emit retrievedAlbumListing(albumDir,_artistName, _albumName);
     }
 

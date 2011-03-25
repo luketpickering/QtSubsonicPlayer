@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QtXml/qdom.h>
 #include <QBuffer>
-#include <QMap>
+#include <QPair>
+#include <QList>
 
 class XMLCacheHandler: public QObject
 {
@@ -31,7 +32,7 @@ public:
                             QString _albumName,
                             QString _trackName);
 
-    QMap<QString,QString>* getCachedWholeAlbum(QString _artistName,
+    QList< QPair<QString,QString> >* getCachedWholeAlbum(QString _artistName,
                                              QString _albumName,
                                               QString* _id);
 

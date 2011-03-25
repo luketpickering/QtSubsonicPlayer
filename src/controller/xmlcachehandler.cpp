@@ -93,7 +93,7 @@ int XMLCacheHandler::getCacheTrackLength(QString _artistName,
 	return track.attribute("duration", "0").toInt();
 }
 
-QMap<QString,QString>* XMLCacheHandler::getCachedWholeAlbum(QString _artistName,
+QList< QPair<QString,QString> >* XMLCacheHandler::getCachedWholeAlbum(QString _artistName,
                                          QString _albumName,
                                          QString* _id)
 {
@@ -101,16 +101,18 @@ QMap<QString,QString>* XMLCacheHandler::getCachedWholeAlbum(QString _artistName,
     QDomElement album = getFirstChildByAttributeValue(artist,
             "title",_albumName);
 
-    QDomNodeList qnl =  album.elementsByTagName("track");
-    QMap<QString,QString>* rtnMap = new QMap<QString,QString>();
+    QDomElement track =  album.firstChildElement("track");
+    QList< QPair<QString,QString> >* rtnList = new QList< QPair<QString,QString> >();
 
-    if(qnl.length() > 0)
+    if(!track.isNull())
     {
-        for(uint ctr = 0; ctr < qnl.length(); ++ctr )
+        while(!track.nextSiblingElement("track").isNull())
         {
-            rtnMap->insert(qnl.at(ctr).toElement().attribute("title","null"),qnl.at(ctr).toElement().attribute("id","null"));
+            rtnList->insert(0,QPair<QString,QString>(track.toElement().attribute("title","null"),
+                                                   track.toElement().attribute("id","null")));
+            track = track.nextSiblingElement("track");
         }
-        return rtnMap;
+        return rtnList;
     }
     else
     {
