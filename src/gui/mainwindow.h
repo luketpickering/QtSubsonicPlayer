@@ -40,10 +40,6 @@ public:
     QStringListModel *albumListModel;
     QStringListModel *trackListModel;
 
-    QString serverpath;
-    QString username;
-    QString password;
-
     // Methods
     MainWindow();
 
@@ -56,10 +52,8 @@ private:
 
 public slots:
     void about();
-    void connectToServer(bool = false);
-    void setServerData(QString&, QString&, QString&);
-    void connectToServerFirstRunErr();
-    void connectToServerCancelClicked();
+    void connectToServer();
+    void setServerData(QString&,QString&,QString&,QString&);
 
     void setTimeLabels(qint64);
     void setTimeElapsedLabel(qint64); 

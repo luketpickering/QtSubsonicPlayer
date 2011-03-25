@@ -11,9 +11,10 @@ class ConnectToServerDialog
     Q_OBJECT
 
 public:
-    QString serverpath;
-    QString username;
-    QString password;
+    QString host;
+    QString usr;
+    QString pss;
+    QString port;
 
     ConnectToServerDialog(QWidget *parent = 0);
 
@@ -21,7 +22,7 @@ private slots:
     void serverData();
 
 signals:
-    void serverDetailsEntered(QString &Server, QString &Username, QString &Password);
+    void serverDetailsEntered(QString&,QString&,QString&,QString&);
 };
 
 #endif // CONNECTTOSERVERDIALOG_H

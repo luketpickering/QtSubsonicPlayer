@@ -28,10 +28,11 @@ MainWindow::MainWindow()
 
     showingTracks = false;
 
-    connectToServer(true);
+    cd = new ConnectionData(" ", " ", " ", 0);
+    rp = new RequestProcessor(cd, this);
+    connectToServer();
     setupRequests();
 }
-
 
 
 // BEGIN: Menu Related Methods and Slots  *************************************
@@ -81,70 +82,32 @@ void MainWindow::about()
 /*
   private slot shows the "Connect To Server" dialog
 */
-void MainWindow::connectToServer(bool firstRun)
+void MainWindow::connectToServer()
 {
-    ConnectToServerDialog *connectToServerDialog =
-            new ConnectToServerDialog(this);
+    ConnectToServerDialog *connectToServerDialog = new ConnectToServerDialog(this);
 
-    if(!firstRun)
-    {
-        delete cd;
-        delete rp;
-
-        disconnect(this, SLOT(connectToServerFirstRunErr()));
-        disconnect(this, SLOT(connectToServerCancelClicked()));
-        connect(connectToServerDialog, SIGNAL(rejected()),
-                this, SLOT(connectToServerCancelClicked()));
-    }
-    else
-    {
-        connect(connectToServerDialog, SIGNAL(rejected()),
-                this, SLOT(connectToServerFirstRunErr()));
-    }
-
-    // connect the signal from connectToServerDialog to the setServerData slot
     connect(connectToServerDialog,
-            SIGNAL(serverDetailsEntered(QString&, QString&, QString&)),
-            this, SLOT(setServerData(QString&,QString&,QString&)));
+            SIGNAL(serverDetailsEntered(QString&,QString&,QString&,QString&)),
+            this, SLOT(setServerData(QString&,QString&,QString&,QString&)));
 
     connectToServerDialog->exec();
 }
-
 
 /*
   slot: setData(QString x3) sets the values of public members
   server, username and password from the values input by the user
   in the ConnectToServerDialog
 */
-void MainWindow::setServerData(QString &_srvr,
-                               QString &_uname,
-                               QString &_passwd)
+void MainWindow::setServerData(QString& _host, QString& _usr, QString& _pss, QString& _port)
 {
-    serverpath = _srvr;
-    username = _uname;
-    password = _passwd;
+    std::cout << "gay" << std::endl;
+    cd->host = _host;
+    cd->usr = _usr;
+    cd->pss = _pss;
+    cd->port = -1;
+    cd->gotServerIP = false;
 
-    cd = new ConnectionData(serverpath, username, password,-1);
-    rp = new RequestProcessor(cd, this);
-    artistListView->setModel(&QStringListModel(QStringList(" ")));
-    albumTracksListView->setModel(&QStringListModel(QStringList(" ")));
     rp->hardResetCache();
-    rp->getIndex();
-}
-
-void MainWindow::connectToServerFirstRunErr()
-{
-    QMessageBox::warning(this, "Warning",
-                         "<p>You must enter server details.</p>");
-
-    connectToServer(true);
-}
-
-void MainWindow::connectToServerCancelClicked()
-{
-    cd = new ConnectionData(serverpath, username, password,-1);
-    rp = new RequestProcessor(cd, this);
-    rp->getIndex();
 }
 
 // END: ConnectToServerDialog Related Methods and Slots ***********************
@@ -182,8 +145,8 @@ void MainWindow::setupMedia()
 
 void MainWindow::recieveTrack(QString _id, int _length)
 {
-    QUrl url("http://" + serverpath + "/rest/stream.view?u=" + username
-             + "&p=" + password + "&v=1.5.0" + "&c=QtSubsonicPlayer"
+    QUrl url("http://" + cd->host + "/rest/stream.view?u=" + cd->usr
+             + "&p=" + cd->pss + "&v=1.5.0" + "&c=QtSubsonicPlayer"
              + "&id=" + _id);
 
     Phonon::MediaSource mediaSource(url);
@@ -312,7 +275,7 @@ void MainWindow::setupRequests()
     connect(rp, SIGNAL(retrievedTrackData(QString,int)),
             this, SLOT(recieveTrack(QString,int)));
 
-    connect(rp,SIGNAL(cacheIsResetting()), this, SLOT(getIndex()));
+    connect(rp,SIGNAL(cacheReset()), this, SLOT(getIndex()));
 }
 
 void MainWindow::getIndex()

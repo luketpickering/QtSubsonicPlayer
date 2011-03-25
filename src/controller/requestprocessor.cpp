@@ -85,9 +85,10 @@ void RequestProcessor::responseIndex(QDomDocument* _respXML)
 	reqList.removeAt(0);
 
 	if(cacheResetting)
-	{
-		emit cacheReset();
+        {
 		cacheResetting = false;
+                emit cacheReset();
+                std::cout << "cache reset" << std::endl;
 	}
 
 	requestRunning = false;

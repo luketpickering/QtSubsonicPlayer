@@ -17,9 +17,10 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
 */
 void ConnectToServerDialog::serverData()
 {
-    serverpath = pathLineEdit->text();
-    username = usernameLineEdit->text();
-    password = passwordLineEdit->text();
+    host = pathLineEdit->text();
+    port = portLineEdit->text();
+    usr = usernameLineEdit->text();
+    pss = passwordLineEdit->text();
 
-    emit serverDetailsEntered(serverpath, username, password);
+    emit serverDetailsEntered(host, usr, pss, port);
 }
