@@ -83,8 +83,14 @@ void RequestProcessor::responseIndex(QDomDocument* _respXML)
 	}
 	
 	reqList.removeAt(0);
+
+	if(cacheResetting)
+	{
+		emit cacheReset();
+		cacheResetting = false;
+	}
+
 	requestRunning = false;
-	cacheResetting = false;
 	runRequest();
 }
 

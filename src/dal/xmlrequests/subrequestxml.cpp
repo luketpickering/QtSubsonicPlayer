@@ -38,12 +38,12 @@ void SubRequestXML::specificHandler()
 	}
 	else if(ec == -2)
 	{
-		printf("Couldn't parse response XML\n");
+            std::cout << "Couldn't parse response XML" << std::endl;
 	}
 	else
 	{
-		printf("Subsonic error code: %i\n",ec);
-	}
+                std::cout << "Subsonic error code: " << ec << std::endl;
+        }
 	netReply->close();
 	netReply->deleteLater();
 }

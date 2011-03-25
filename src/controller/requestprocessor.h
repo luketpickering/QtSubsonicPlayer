@@ -43,6 +43,7 @@ signals:
 	void pingSucceded();
 	void cacheRequiresReset();
 	void cacheIsResetting();
+	void cacheReset();
 
 private slots:
 	void hardReset();
