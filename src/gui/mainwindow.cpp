@@ -209,6 +209,7 @@ void MainWindow::trackChanged(Phonon::MediaSource newSource)
 
     currentIndex = searchCurrentTrackPairList(id,1);
     currentTrack = currentTrackPairList->at(currentIndex).first;
+    currentTrackTotalTime = mediaObject->totalTime()/tickInterval;
 
     setWindowTitle(currentArtist + " - " + currentTrack);
 }
