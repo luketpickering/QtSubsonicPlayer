@@ -11,5 +11,6 @@
     </qresource>
     <qresource prefix="/applicationicons">
         <file>subsonic-icon.png</file>
+        <file>subsonic.icns</file>
     </qresource>
 </RCC>
