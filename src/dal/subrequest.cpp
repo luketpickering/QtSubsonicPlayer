@@ -160,6 +160,10 @@ int SubRequest::checkBumps()
 {
 	return bumps;
 }
+void SubRequest::resetBumps()
+{
+	bumps = 0;
+}
 
 // END: Protected Slots *******************************************************
 

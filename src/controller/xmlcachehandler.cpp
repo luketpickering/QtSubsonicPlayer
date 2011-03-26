@@ -151,7 +151,7 @@ bool XMLCacheHandler::saveArtist(QDomDocument* _artist,
             artist.appendChild(qnl.at(0));
 		}
 		delete _artist;
-		return saveCacheToDisk();
+		return true;
 	}
 	delete _artist;
 	return false;
@@ -175,7 +175,7 @@ bool XMLCacheHandler::saveAlbum(QDomDocument* _album, QString _artistName,
             album.appendChild(qnl.at(0));
 		}
 		delete _album;
-		return saveCacheToDisk();
+		return true;
 	}
 	delete _album;
 	return false;
@@ -229,7 +229,7 @@ bool XMLCacheHandler::saveCacheToDisk()
         file.write(cacheFile->toString(3).toUtf8());
         file.flush();
         file.close();
-        printf("saved new cache\n");
+		std::cout << "saved new cache" << std::endl;
         return true;
     }
     return false;

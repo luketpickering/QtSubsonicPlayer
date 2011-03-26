@@ -17,27 +17,10 @@ RequestProcessor::RequestProcessor(ConnectionData* _cd, QObject* parent) : QObje
 {
     requestRunning = false;
     cacheResetting = false;
+	consecutiveReqs = 0;
     connData = _cd;
     connect(&xch, SIGNAL(requireHardReset()), this, SIGNAL(cacheRequiresReset()));
     xch.loadCacheFromDisk();
-}
-
-void RequestProcessor::hardResetCache()
-{
-    cacheResetting = true;
-
-    int deleteUntil = (requestRunning) ? 1 : 0;
-
-    while(reqList.count() > deleteUntil)
-    {
-        reqList.removeAt(deleteUntil);
-    }
-
-    RetrieveIndex* indReq = new RetrieveIndex(connData,this);
-    connect(indReq,SIGNAL(gotIndex(QDomDocument*)),
-            this, SLOT(responseIndex(QDomDocument*)));
-
-    addToQueue(indReq);
 }
 
 void RequestProcessor::getIndex()
@@ -52,6 +35,19 @@ void RequestProcessor::getIndex()
     {
         emit retrievedIndex(index);
     }
+}
+
+void RequestProcessor::hardResetCache()
+{
+    cacheResetting = true;
+
+	clearQueue();
+
+    RetrieveIndex* indReq = new RetrieveIndex(connData,this);
+    connect(indReq,SIGNAL(gotIndex(QDomDocument*)),
+            this, SLOT(responseIndex(QDomDocument*)));
+
+    addToQueue(indReq);
 }
 
 void RequestProcessor::responseIndex(QDomDocument* _respXML)
@@ -135,7 +131,12 @@ void RequestProcessor::responseArtist(QDomDocument* _respXML,
 {
     sender()->deleteLater();
     xch.saveArtist(_respXML, _artistName);
-    int bla = ((SubRequest*)sender())->checkBumps();
+    
+	if(consecutiveReqs > 10)
+	{
+		xch.saveCacheToDisk();
+		consecutiveReqs = 0;
+	}
 
     if(((SubRequest*)sender())->checkBumps() == 0 )
     {
@@ -213,6 +214,12 @@ void RequestProcessor::responseAlbum(QDomDocument* _respXML, QString _artistName
 {
     sender()->deleteLater();
     xch.saveAlbum(_respXML, _artistName, _albumName);
+
+	if(consecutiveReqs > 10)
+	{
+		xch.saveCacheToDisk();
+		consecutiveReqs = 0;
+	}
 
     if(((SubRequest*)sender())->checkBumps() == 0 )
     {
@@ -321,8 +328,24 @@ void RequestProcessor::responseTrackStream(QBuffer* _buf,
 */
 
 
+void RequestProcessor::clearQueue()
+{
 
+	int deleteUntil = (requestRunning) ? 1 : 0;
 
+    while(reqList.count() > deleteUntil)
+    {
+		reqList.at(deleteUntil)->deleteLater();
+        reqList.removeAt(deleteUntil);
+    }
+
+	if(deleteUntil == 1)
+	{
+		reqList.at(0)->bump();
+		reqList.at(0)->deleteLater();
+		reqList.removeAt(0);
+	}
+}
 
 void RequestProcessor::addToQueue(SubRequest* _toAdd)
 {
@@ -344,6 +367,7 @@ void RequestProcessor::runRequest()
 	{
 		requestRunning = true;
 		reqList.at(0)->makeRequest();
+		++consecutiveReqs;
 	}
 }
 
@@ -354,6 +378,10 @@ bool RequestProcessor::checkAlreadyQueued(SubRequest* _toCheck)
 		if(reqList.at(ctr)->serialiseRequest()
 			.compare(_toCheck->serialiseRequest()) == 0)
 		{
+			reqList.move(ctr,1);
+                        reqList.at(1)->resetBumps();
+			std::cout << qPrintable(reqList.at(1)->serialiseRequest()) 
+			<< " re-prioritised. will go out next. \n" << std::endl;
 			return true;
 		}
 	}

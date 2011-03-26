@@ -25,6 +25,7 @@ public:
 		virtual QString serialiseRequest();
 		int bump();
 		int checkBumps();
+		void resetBumps();
 
 signals:
 	void globalHostStringChanged();

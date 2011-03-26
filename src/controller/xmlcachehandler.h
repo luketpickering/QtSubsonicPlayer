@@ -43,8 +43,8 @@ public:
 
     //----- Functions
     //--IO
-    bool loadCacheFromDisk();
     bool saveCacheToDisk();
+    bool loadCacheFromDisk();
 
 signals:
 

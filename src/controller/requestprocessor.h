@@ -5,7 +5,6 @@
 #include "xmlcachehandler.h"
 #include "../dal/connectiondata.h"
 #include "../dal/subrequest.h"
-#include <QMap>
 
 
 class RequestProcessor : public QObject
@@ -15,17 +14,12 @@ public:
 
     //TODO_____________________________________________________________
 
-	//make it so that save is not every cache response.
+    //have a function to check if serverside directory has been changed
+    //since caches began
 
-        //MAKE IT SO::: if a request tries to be re-added it bumps that request
-        //to the top of the queue and sets its bump count to zero
-
-        //have a function to check if serverside directory has been changed
-        //since caches began
-
-        //need to be able to check the response for a bad directory response
-
-        //investigate searching the cache just prior to the request going out
+	//need to rework the subrequest class and have signal piping through
+	//the requestprocessor
+    //need to be able to check the response for a bad directory response
     //_________________________________________________________________
 
 	RequestProcessor(ConnectionData* _cd, QObject* parent);
@@ -40,13 +34,15 @@ public:
 		QString _track);
 	void requestPing();
 
+	void clearQueue();
+
 signals:
 	void retrievedIndex(QStringList* _index);
 	void retrievedArtistListing(QStringList* _art,
 		QString _artistName);
 
-        void retrievedAlbumListing(QList< QPair<QString,QString> >* _alb,
-                QString _artistName, QString _albumName);
+   void retrievedAlbumListing(QList< QPair<QString,QString> >* _alb,
+            QString _artistName, QString _albumName);
 
         /*
 	void retrievedAlbumListing(QStringList* _alb, 
@@ -66,10 +62,9 @@ signals:
 	void cacheRequiresReset();
 	void cacheIsResetting();
 	void cacheReset();
-        void cacheResetFailed();
+    void cacheResetFailed();
 
 private slots:
-        //void hardReset();
 
 	void responseIndex(QDomDocument* _respXML);
 	void responseArtist(QDomDocument* _respXML, QString _artistName);
@@ -87,6 +82,8 @@ private:
 	ConnectionData* connData;
 	bool requestRunning;
 	bool cacheResetting;
+
+	ushort consecutiveReqs;
 
 	void runRequest();
 	void addToQueue(SubRequest* _toAdd);
